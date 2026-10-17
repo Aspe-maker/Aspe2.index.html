@@ -4,798 +4,1377 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>بطاقاتي التعليمية</title>
+
   <style>
     :root {
-      color-scheme: light;
-      --bg: #f4f6fb;
-      --panel: #fff;
-      --text: #172033;
-      --muted: #68738a;
-      --primary: #465ce5;
-      --border: #e1e6f0;
-      --danger: #c0392b;
-      --shadow: 0 8px 24px #18264a12;
+      --bg: #f5f7fc;
+      --surface: #ffffff;
+      --ink: #202943;
+      --muted: #737d94;
+      --line: #e6eaf2;
+      --primary: #596ce6;
+      --primary-dark: #4658d0;
+      --soft: #eef0ff;
+      --danger: #b42318;
+      --shadow: 0 10px 30px rgba(36, 49, 91, .06);
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at top right, #e9edff 0, transparent 34rem),
+        var(--bg);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      line-height: 1.65;
     }
+
     button, input, textarea { font: inherit; }
     button { cursor: pointer; }
-    .app { max-width: 1100px; margin: auto; padding: 20px; }
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; flex-wrap: wrap; margin-bottom: 18px;
+    button:disabled { opacity: .55; cursor: not-allowed; }
+
+    .app {
+      width: min(1050px, 100%);
+      margin: 0 auto;
+      padding: 24px 16px 50px;
     }
-    h1, h2, h3 { line-height: 1.3; }
-    h1 { margin: 0; font-size: 1.6rem; }
-    h2 { margin: 0 0 12px; font-size: 1.2rem; }
-    .muted { color: var(--muted); font-size: .93rem; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      color: #fff;
+      font-size: 23px;
+      background: linear-gradient(135deg, #7787f5, #4d60dc);
+      box-shadow: 0 8px 20px rgba(83, 102, 232, .22);
+    }
+
+    h1 { margin: 0; font-size: 1.38rem; }
+    h2 { margin: 0; font-size: 1.12rem; }
+    .subheading, .muted { color: var(--muted); }
+    .subheading { margin: 3px 0 0; font-size: .9rem; }
+
+    .toolbar, .row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
     .panel {
-      background: var(--panel); border: 1px solid var(--border);
-      border-radius: 16px; padding: 18px; margin-bottom: 16px;
+      margin: 14px 0;
+      padding: 20px;
+      border: 1px solid #e8ebf3;
+      border-radius: 20px;
+      background: var(--surface);
       box-shadow: var(--shadow);
     }
-    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .grow { flex: 1; }
-    input, textarea {
-      width: 100%; border: 1px solid var(--border); border-radius: 10px;
-      padding: 10px 12px; background: #fff; color: var(--text);
-    }
-    textarea { min-height: 78px; resize: vertical; }
-    .field { display: grid; gap: 6px; flex: 1; min-width: 200px; }
-    button {
-      border: 0; border-radius: 10px; padding: 9px 14px;
-      background: var(--primary); color: white;
-    }
-    button.secondary { background: #edf0ff; color: #293bb0; }
-    button.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
-    button.danger { background: #fff0ef; color: var(--danger); }
-    button:disabled { opacity: .5; cursor: not-allowed; }
-    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
-    .tab.active { background: var(--primary); color: white; }
-    .section-name { min-width: 170px; max-width: 300px; }
-    .card-list { display: grid; gap: 14px; }
-    .card-item { perspective: 1000px; }
-    .flip-card {
-      position: relative; min-height: 230px; transform-style: preserve-3d;
-      transition: transform .55s; cursor: pointer; outline: none;
-    }
-    .flip-card.flipped { transform: rotateY(180deg); }
-    .face {
-      position: absolute; inset: 0; min-height: 230px; padding: 18px;
-      border: 1px solid var(--border); border-radius: 16px; background: white;
-      box-shadow: var(--shadow); backface-visibility: hidden;
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; text-align: center; overflow: hidden;
-    }
-    .face.back { transform: rotateY(180deg); background: #f5f6ff; }
-    .face img { max-width: 100%; max-height: 230px; object-fit: contain; margin-top: 10px; }
-    .face-text { white-space: pre-wrap; overflow-wrap: anywhere; }
-    .face-label { color: var(--muted); font-size: .82rem; margin-bottom: 8px; }
-    .card-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 9px; }
-    .empty { padding: 20px; text-align: center; color: var(--muted); }
-    .quiz-box { display: grid; gap: 12px; }
-    .quiz-question { border: 1px solid var(--border);احفظ الكود كاملًا باسم `index.html` وافتحه في المتصفح. يمكنك تصفح البطاقات وقلبها بالضغط عليها من دون بدء اختبار. تُحفظ الصور في `IndexedDB`، والبطاقات والأقسام والتقدم في `localStorage`. سعة الصور المتاحة تعتمد على المتصفح ومساحة الجهاز.
 
-```html
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>بطاقاتي التعليمية</title>
-<style>
-  :root {
-    font-family: system-ui, sans-serif;
-    color: #172033;
-    background: #f4f6fb;
-    font-synthesis: none;
-  }
-  * { box-sizing: border-box }
-  body { margin: 0; }
-  button, input, textarea { font: inherit }
-  button {
-    border: 0; border-radius: 9px; padding: 9px 13px;
-    background: #465ce5; color: white; cursor: pointer;
-  }
-  button:hover { filter: brightness(.96) }
-  button:disabled { opacity: .5; cursor: default }
-  button.secondary { background: #e9edff; color: #293bb0 }
-  button.danger { background: #fff0ef; color: #a52b20 }
-  input, textarea {
-    width: 100%; padding: 10px 12px; border: 1px solid #dfe4ee;
-    border-radius: 9px; background: white; color: inherit;
-  }
-  textarea { min-height: 80px; resize: vertical }
-  .app { max-width: 1050px; padding: 20px; margin: auto }
-  header, .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap }
-  header { justify-content: space-between; margin-bottom: 16px }
-  h1 { margin: 0; font-size: 1.5rem }
-  h2 { margin: 0 0 12px; font-size: 1.2rem }
-  .panel {
-    background: white; border: 1px solid #e1e6f0; border-radius: 14px;
-    padding: 16px; margin: 14px 0; box-shadow: 0 6px 20px #18264a0c;
-  }
-  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 }
-  .tab.active { background: #465ce5; color: white }
-  .field { display: grid; gap: 5px; flex: 1; min-width: 200px }
-  .muted { color: #68738a; font-size: .92rem }
-  .card-list { display: grid; gap: 14px }
-  .card-wrap { perspective: 1000px }
-  .flip-card {
-    position: relative; min-height: 220px; transform-style: preserve-3d;
-    transition: transform .5s; cursor: pointer;
-  }
-  .flip-card.flipped { transform: rotateY(180deg) }
-  .face {
-    position: absolute; inset: 0; min-height: 220px; padding: 18px;
-    border: 1px solid #e1e6f0; border-radius: 14px; background: white;
-    box-shadow: 0 6px 20px #18264a0c; backface-visibility: hidden;
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; text-align: center; overflow: auto;
-  }
-  .face.back { transform: rotateY(180deg); background: #f5f6ff }
-  .face img { max-width: 100%; max-height: 260px; object-fit: contain; margin-top: 10px }
-  .face-text { white-space: pre-wrap; overflow-wrap: anywhere }
-  .label { color: #68738a; font-size: .82rem; margin-bottom: 7px }
-  .card-actions { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 8px }
-  .empty { padding: 18px; text-align: center; color: #68738a }
-  .form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px }
-  .quiz-options { display: grid; gap: 8px }
-  .quiz-options button { text-align: start }
-  .feedback { min-height: 1.5em; font-weight: 600 }
-  .hidden { display: none !important }
-  @media(max-width:650px) {
-    .app { padding: 12px }
-    .form-grid { grid-template-columns: 1fr }
-  }
-</style>
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .muted { font-size: .9rem; }
+
+    .btn {
+      min-height: 41px;
+      padding: 9px 15px;
+      border: 0;
+      border-radius: 12px;
+      color: white;
+      background: var(--primary);
+      font-weight: 650;
+      box-shadow: 0 3px 9px rgba(45, 58, 110, .07);
+      transition: .18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: var(--primary-dark);
+    }
+
+    .btn.secondary {
+      color: #4658c6;
+      background: var(--soft);
+      box-shadow: none;
+    }
+
+    .btn.secondary:hover { background: #e3e7ff; }
+
+    .btn.ghost {
+      color: #3e4861;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .btn.ghost:hover { background: #f8f9fd; }
+
+    .btn.danger {
+      color: var(--danger);
+      background: #fff0ee;
+      box-shadow: none;
+    }
+
+    .btn.danger:hover { background: #ffe4e0; }
+
+    .btn.small {
+      min-height: 35px;
+      padding: 6px 11px;
+      font-size: .88rem;
+    }
+
+    .section-create {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) auto;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .section-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .section-tab {
+      padding: 9px 16px;
+      border: 1px solid #e3e7f1;
+      border-radius: 12px;
+      color: #4c5670;
+      background: #f9faff;
+      transition: .2s ease;
+    }
+
+    .section-tab:hover {
+      transform: translateY(-1px);
+      border-color: #b9c2f7;
+      background: #f1f3ff;
+    }
+
+    .section-tab.active {
+      border-color: transparent;
+      color: white;
+      background: linear-gradient(135deg, #7180ef, #5264df);
+      box-shadow: 0 6px 16px rgba(83, 102, 232, .22);
+    }
+
+    .input, .textarea {
+      display: block;
+      width: 100%;
+      padding: 13px 15px;
+      border: 1px solid #e2e7f0;
+      border-radius: 14px;
+      outline: none;
+      color: var(--ink);
+      background: #fbfcff;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+
+    .input:hover, .textarea:hover {
+      border-color: #c6ceef;
+      background: #fff;
+    }
+
+    .input:focus, .textarea:focus {
+      border-color: #7182ef;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(83, 102, 232, .12);
+    }
+
+    .textarea {
+      min-height: 105px;
+      resize: vertical;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .field {
+      display: grid;
+      min-width: 0;
+      gap: 8px;
+    }
+
+    .field > span {
+      color: #303954;
+      font-size: .92rem;
+      font-weight: 650;
+    }
+
+    .file-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px dashed #c8d0e4;
+      border-radius: 14px;
+      color: #68728a;
+      background: #f8f9ff;
+      transition: .2s ease;
+    }
+
+    .file-input:hover {
+      border-color: #7b89e8;
+      background: #f1f3ff;
+    }
+
+    .help { color: var(--muted); font-size: .86rem; }
+    .form-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+    .status { color: var(--muted); font-size: .9rem; }
+
+    .cards { display: grid; gap: 17px; }
+
+    /* البطاقة ثلاثية الأبعاد */
+    .flip-scene {
+      perspective: 1100px;
+      border-radius: 20px;
+      transition: transform .22s ease;
+    }
+
+    .flip-scene:hover { transform: translateY(-3px); }
+
+    .flashcard {
+      position: relative;
+      min-height: 235px;
+      transform-style: preserve-3d;
+      transition: transform .62s cubic-bezier(.2, .75, .25, 1);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .flashcard.is-flipped { transform: rotateY(180deg); }
+
+    .flashcard:focus-visible .card-face {
+      outline: 3px solid #93a0ff;
+      outline-offset: 3px;
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      min-height: 235px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+      padding: 26px;
+      border: 1px solid #e8ebf4;
+      border-radius: 20px;
+      text-align: center;
+      background: linear-gradient(145deg, #fff 20%, #f8f9ff 100%);
+      box-shadow: 0 10px 30px rgba(36, 49, 91, .08);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .card-face.answer-face {
+      transform: rotateY(180deg);
+      border-color: #dfe3ff;
+      background: linear-gradient(145deg, #f1f3ff, #fff 85%);
+    }
+
+    .face-label {
+      align-self: flex-start;
+      margin-bottom: 16px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      color: #5868d8;
+      background: #f0f2ff;
+      font-size: .8rem;
+    }
+
+    .face-content {
+      width: 100%;
+      color: #27314c;
+      font-size: 1.15rem;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .card-image {
+      display: block;
+      max-width: 100%;
+      max-height: 280px;
+      margin: 12px auto 0;
+      border: 1px solid #edf0f6;
+      border-radius: 14px;
+      object-fit: contain;
+      background: #fff;
+    }
+
+    .flip-hint {
+      padding-inline: 5px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    .card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 9px; }
+
+    .empty {
+      padding: 28px 16px;
+      border: 1px dashed #d7deeb;
+      border-radius: 16px;
+      color: var(--muted);
+      background: #fafbff;
+      text-align: center;
+    }
+
+    .empty-icon { display: block; margin-bottom: 6px; font-size: 30px; }
+    .hidden { display: none !important; }
+
+    .quiz-area { display: grid; gap: 12px; }
+
+    .quiz-question {
+      padding: 19px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fafbff;
+      text-align: center;
+    }
+
+    .quiz-counter { margin-bottom: 8px; color: var(--muted); font-size: .9rem; }
+    .quiz-prompt { font-size: 1.05rem; white-space: pre-wrap; }
+    .quiz-prompt img { display: block; max-width: 100%; max-height: 220px; margin: 10px auto; }
+
+    .quiz-options { display: grid; gap: 9px; }
+
+    .quiz-option {
+      padding: 12px 15px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: #fff;
+      text-align: start;
+      transition: .15s ease;
+    }
+
+    .quiz-option:hover:not(:disabled) {
+      border-color: #98a5fa;
+      background: #f8f9ff;
+    }
+
+    .feedback { min-height: 24px; font-weight: 700; }
+    .correct { color: #16834b; }
+    .incorrect { color: var(--danger); }
+
+    @media (max-width: 650px) {
+      .app { padding: 15px 11px 35px; }
+      .panel { padding: 15px; }
+      .form-grid, .section-create { grid-template-columns: 1fr; }
+      .toolbar { width: 100%; }
+      .toolbar .btn { flex: 1; }
+      .card-face { min-height: 215px; padding: 20px 16px; border-radius: 17px; }
+      .flashcard { min-height: 215px; }
+      .face-content { font-size: 1.05rem; }
+      .input, .textarea, .file-input { border-radius: 12px; }
+    }
+  </style>
 </head>
+
 <body>
-<div class="app">
-  <header>
-    <h1 id="title">بطاقاتي التعليمية</h1>
-    <div class="row">
-      <button class="secondary" id="languageBtn">English</button>
-      <button class="secondary" id="directionBtn">⇄ RTL / LTR</button>
-    </div>
-  </header>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">▣</div>
+        <div>
+          <h1 id="appTitle"></h1>
+          <p class="subheading" id="appSubtitle"></p>
+        </div>
+      </div>
 
-  <section class="panel">
-    <h2 id="sectionsHeading">الأقسام</h2>
-    <div class="row">
-      <input id="newSectionName" class="grow" placeholder="اسم القسم الجديد">
-      <button id="addSectionBtn">إضافة قسم</button>
-      <button id="renameSectionBtn" class="secondary">إعادة تسمية القسم</button>
-      <button id="deleteSectionBtn" class="danger">حذف القسم</button>
-    </div>
-    <div id="sectionTabs" class="tabs"></div>
-  </section>
+      <div class="toolbar">
+        <button class="btn ghost" id="languageBtn" type="button"></button>
+        <button class="btn ghost" id="directionBtn" type="button"></button>
+      </div>
+    </header>
 
-  <section class="panel">
-    <h2 id="formHeading">إضافة بطاقة</h2>
-    <div class="form-grid">
-      <label class="field"><span id="questionLabel">السؤال</span>
-        <textarea id="questionText"></textarea>
-      </label>
-      <label class="field"><span id="answerLabel">الإجابة</span>
-        <textarea id="answerText"></textarea>
-      </label>
-      <label class="field"><span id="questionImageLabel">صورة السؤال (اختياري)</span>
-        <input id="questionImage" type="file" accept="image/\*">
-      </label>
-      <label class="field"><span id="answerImageLabel">صورة الإجابة (اختياري)</span>
-        <input id="answerImage" type="file" accept="image/\*">
-      </label>
-    </div>
-    <div class="row" style="margin-top:12px">
-      <button id="saveCardBtn">إضافة البطاقة</button>
-      <button id="cancelEditBtn" class="secondary hidden">إلغاء التعديل</button>
-      <span id="storageStatus" class="muted"></span>
-    </div>
-  </section>
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <h2 id="sectionsTitle"></h2>
+          <div class="muted" id="sectionsHint"></div>
+        </div>
+      </div>
 
-  <section class="panel">
-    <div class="row">
-      <h2 id="cardsHeading" class="grow">البطاقات</h2>
-      <button id="startQuizBtn">اختبار عشوائي</button>
-      <button id="showCardsBtn" class="secondary hidden">عرض البطاقات</button>
-      <button id="showMistakesBtn" class="secondary">الأخطاء</button>
-    </div>
-    <p id="flipHint" class="muted">اضغط على البطاقة لقلبها وإظهار الإجابة.</p>
-    <div id="quizBox" class="quiz-box hidden"></div>
-    <div id="cardList" class="card-list"></div>
-  </section>
-</div>
+      <div class="section-create">
+        <input class="input" id="newSectionInput" type="text">
+        <button class="btn" id="addSectionBtn" type="button"></button>
+      </div>
 
-<script>
-(() => {
-  "use strict";
+      <div class="section-tabs" id="sectionTabs"></div>
+    </section>
 
-  const STORAGE\_KEY = "flashcards\_app\_v1";
-  const DB\_NAME = "flashcards\_images\_v1";
-  const DB\_STORE = "images";
+    <section class="panel hidden" id="editorPanel">
+      <div class="panel-heading">
+        <div>
+          <h2 id="editorTitle"></h2>
+          <div class="muted" id="editorSubtitle"></div>
+        </div>
+      </div>
 
-  const text = {
-    ar: {
-      title:"بطاقاتي التعليمية", sections:"الأقسام", newSection:"اسم القسم الجديد",
-      addSection:"إضافة قسم", rename:"إعادة تسمية القسم", deleteSection:"حذف القسم",
-      addCard:"إضافة بطاقة", editCard:"تعديل بطاقة", question:"السؤال", answer:"الإجابة",
-      qImage:"صورة السؤال (اختياري)", aImage:"صورة الإجابة (اختياري)",
-      cards:"البطاقات", quiz:"اختبار عشوائي", showCards:"عرض البطاقات",
-      mistakes:"الأخطاء", flip:"اضغط على البطاقة لقلبها وإظهار الإجابة.",
-      empty:"لا توجد بطاقات في هذا القسم بعد.", emptyMistakes:"لا توجد أخطاء محفوظة لهذا القسم.",
-      clickAnswer:"اضغط لإظهار الإجابة", clickQuestion:"اضغط للعودة إلى السؤال",
-      save:"حفظ التعديلات", add:"إضافة البطاقة", cancel:"إلغاء التعديل",
-      edit:"تعديل", remove:"حذف", moveBack:"إعادة إلى البطاقات",
-      sectionPrompt:"اكتب اسم القسم:", confirmDelete:"هل تريد حذف القسم وكل بطاقاته وأخطائه؟",
-      needCards:"أضف بطاقتين على الأقل لبدء الاختبار.", questionNumber:"السؤال",
-      correct:"إجابة صحيحة!", incorrect:"إجابة غير صحيحة. أُضيفت إلى الأخطاء.",
-      finish:"انتهى الاختبار", score:"النتيجة", next:"التالي", restart:"اختبار جديد",
-      choose:"اختر الإجابة الصحيحة:", noAnswer:"اكتب سؤالًا أو أضف صورة للسؤال، واكتب إجابة أو أضف صورة للإجابة.",
-      deleted:"تم حذف البطاقة.", saved:"تم الحفظ.", imageError:"تعذّر حفظ الصورة. تحقق من مساحة المتصفح.",
-      langButton:"English", all:"كل البطاقات", addMistake:"أُضيفت البطاقة إلى الأخطاء.",
-      quizDone:"انتهى الاختبار."
-    },
-    en: {
-      title:"My Study Cards", sections:"Sections", newSection:"New section name",
-      addSection:"Add section", rename:"Rename section", deleteSection:"Delete section",
-      addCard:"Add card", editCard:"Edit card", question:"Question", answer:"Answer",
-      qImage:"Question image (optional)", aImage:"Answer image (optional)",
-      cards:"Cards", quiz:"Random quiz", showCards:"Show cards",
-      mistakes:"Mistakes", flip:"Click a card to flip it and reveal the answer.",
-      empty:"No cards in this section yet.", emptyMistakes:"No saved mistakes in this section.",
-      clickAnswer:"Click to reveal the answer", clickQuestion:"Click to return to the question",
-      save:"Save changes", add:"Add card", cancel:"Cancel edit",
-      edit:"Edit", remove:"Delete", moveBack:"Move back to cards",
-      sectionPrompt:"Enter a section name:", confirmDelete:"Delete this section and all its cards and mistakes?",
-      needCards:"Add at least two cards to start a quiz.", questionNumber:"Question",
-      correct:"Correct!", incorrect:"Incorrect. Added to Mistakes.",
-      finish:"Quiz complete", score:"Score", next:"Next", restart:"New quiz",
-      choose:"Choose the correct answer:", noAnswer:"Add question text or an image, and answer text or an image.",
-      deleted:"Card deleted.", saved:"Saved.", imageError:"Could not save the image. Check available browser storage.",
-      langButton:"العربية", all:"All cards", addMistake:"Added to Mistakes.",
-      quizDone:"Quiz complete."
-    }
-  };
+      <div class="form-grid">
+        <label class="field">
+          <span id="questionLabel"></span>
+          <textarea class="textarea" id="questionText"></textarea>
+        </label>
 
-  let state = loadState();
-  let language = state.language || "ar";
-  let activeSectionId = state.activeSectionId || state.sections[0]?.id;
-  let view = "cards";
-  let editingId = null;
-  let quiz = null;
-  const objectUrls = new Set();
-  let dbPromise;
+        <label class="field">
+          <span id="answerLabel"></span>
+          <textarea class="textarea" id="answerText"></textarea>
+        </label>
 
-  const \$ = id => document.getElementById(id);
-  const uid = () => crypto.randomUUID ? crypto.randomUUID() :
-    "id\_" + Date.now() + "\_" + Math.random().toString(16).slice(2);
-  const t = key => text[language][key];
+        <label class="field">
+          <span id="questionImageLabel"></span>
+          <input class="file-input" id="questionImage" type="file" accept="image/*">
+        </label>
 
-  function loadState() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE\_KEY));
-      if (saved && Array.isArray(saved.sections)) return saved;
-    } catch (e) {}
-    const first = { id: uid(), name: "عام", cards: [], mistakes: [] };
-    return { sections: [first], activeSectionId: first.id, language: "ar", progress: {} };
-  }
+        <label class="field">
+          <span id="answerImageLabel"></span>
+          <input class="file-input" id="answerImage" type="file" accept="image/*">
+        </label>
+      </div>
 
-  function persist() {
-    state.activeSectionId = activeSectionId;
-    state.language = language;
-    try {
-      localStorage.setItem(STORAGE\_KEY, JSON.stringify(state));
-    } catch (e) {
-      alert("تعذر حفظ البيانات النصية في المتصفح.");
-    }
-  }
+      <p class="help" id="imageHelp"></p>
 
-  function currentSection() {
-    return state.sections.find(s => s.id === activeSectionId) || state.sections[0];
-  }
+      <div class="form-actions">
+        <button class="btn" id="saveCardBtn" type="button"></button>
+        <button class="btn secondary hidden" id="cancelEditBtn" type="button"></button>
+        <span class="status" id="statusText"></span>
+      </div>
+    </section>
 
-  function openDB() {
-    if (!("indexedDB" in window)) return Promise.reject(new Error("IndexedDB unavailable"));
-    if (!dbPromise) {
-      dbPromise = new Promise((resolve, reject) => {
-        const req = indexedDB.open(DB\_NAME, 1);
-        req.onupgradeneeded = () => {
-          if (!req.result.objectStoreNames.contains(DB\_STORE))
-            req.result.createObjectStore(DB\_STORE);
-        };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-      });
-    }
-    return dbPromise;
-  }
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <h2 id="listTitle"></h2>
+          <div class="muted" id="listSubtitle"></div>
+        </div>
 
-  async function putImage(file) {
-    if (!file) return null;
-    const db = await openDB();
-    const id = uid();
-    await new Promise((resolve, reject) => {
-      const tx = db.transaction(DB\_STORE, "readwrite");
-      tx.objectStore(DB\_STORE).put(file, id);
-      tx.oncomplete = resolve;
-      tx.onerror = () => reject(tx.error);
-      tx.onabort = () => reject(tx.error);
-    });
-    return id;
-  }
+        <div class="toolbar">
+          <button class="btn secondary hidden" id="mistakesBtn" type="button"></button>
+          <button class="btn secondary hidden" id="backToCardsBtn" type="button"></button>
+          <button class="btn" id="quizBtn" type="button"></button>
+        </div>
+      </div>
 
-  async function getImageUrl(id) {
-    if (!id) return "";
-    const db = await openDB();
-    const blob = await new Promise((resolve, reject) => {
-      const req = db.transaction(DB\_STORE, "readonly").objectStore(DB\_STORE).get(id);
-      req.onsuccess = () => resolve(req.result || null);
-      req.onerror = () => reject(req.error);
-    });
-    if (!blob) return "";
-    const url = URL.createObjectURL(blob);
-    objectUrls.add(url);
-    return url;
-  }
+      <div id="cardList" class="cards"></div>
+      <div id="quizArea" class="quiz-area hidden"></div>
+    </section>
+  </main>
 
-  async function deleteImage(id) {
-    if (!id) return;
-    try {
-      const db = await openDB();
-      await new Promise((resolve, reject) => {
-        const tx = db.transaction(DB\_STORE, "readwrite");
-        tx.objectStore(DB\_STORE).delete(id);
-        tx.oncomplete = resolve;
-        tx.onerror = () => reject(tx.error);
-      });
-    } catch (e) {}
-  }
+  <script>
+    "use strict";
 
-  function updateLanguage() {
-    document.documentElement.lang = language;
-    document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
-    \$("title").textContent = t("title");
-    \$("sectionsHeading").textContent = t("sections");
-    \$("newSectionName").placeholder = t("newSection");
-    \$("addSectionBtn").textContent = t("addSection");
-    \$("renameSectionBtn").textContent = t("rename");
-    \$("deleteSectionBtn").textContent = t("deleteSection");
-    \$("formHeading").textContent = editingId ? t("editCard") : t("addCard");
-    \$("questionLabel").textContent = t("question");
-    \$("answerLabel").textContent = t("answer");
-    \$("questionImageLabel").textContent = t("qImage");
-    \$("answerImageLabel").textContent = t("aImage");
-    \$("cardsHeading").textContent = view === "mistakes" ? t("mistakes") : t("cards");
-    \$("startQuizBtn").textContent = t("quiz");
-    \$("showCardsBtn").textContent = t("showCards");
-    \$("showMistakesBtn").textContent = t("mistakes");
-    \$("flipHint").textContent = t("flip");
-    \$("languageBtn").textContent = t("langButton");
-    \$("saveCardBtn").textContent = editingId ? t("save") : t("add");
-    \$("cancelEditBtn").textContent = t("cancel");
-  }
+    const APP_KEY = "study_cards_app_v3";
+    const DB_NAME = "study_cards_images_v3";
+    const DB_STORE = "images";
 
-  function renderTabs() {
-    const host = \$("sectionTabs");
-    host.replaceChildren();
-    state.sections.forEach(section => {
-      const button = document.createElement("button");
-      button.className = "tab" + (section.id === activeSectionId ? " active" : "");
-      button.textContent = section.name;
-      button.onclick = () => {
-        activeSectionId = section.id;
-        view = "cards";
-        quiz = null;
-        \$("quizBox").classList.add("hidden");
-        \$("showCardsBtn").classList.add("hidden");
-        persist();
-        render();
+    const text = {
+      ar: {
+        title: "بطاقاتي التعليمية",
+        subtitle: "أنشئ أقسامك وراجع بطاقاتك بسهولة",
+        sections: "أقسام الدراسة",
+        sectionsHint: "أنشئ قسمًا أولًا، ثم اختره لإضافة البطاقات.",
+        sectionPlaceholder: "مثال: الفيزياء",
+        addSection: "＋ إضافة قسم",
+        editor: "إضافة بطاقة",
+        editEditor: "تعديل البطاقة",
+        editorHint: "أضف نصًا أو صورة للسؤال والإجابة.",
+        question: "السؤال",
+        answer: "الإجابة",
+        questionPlaceholder: "اكتب السؤال هنا...",
+        answerPlaceholder: "اكتب الإجابة هنا...",
+        questionImage: "صورة السؤال (اختياري)",
+        answerImage: "صورة الإجابة (اختياري)",
+        imageHelp: "تُحفظ الصور في مساحة تخزين المتصفح، ولا يفرض الموقع حدًا قدره 2 ميغابايت.",
+        addCard: "إضافة البطاقة",
+        save: "حفظ التعديلات",
+        cancel: "إلغاء",
+        cards: "البطاقات",
+        listHint: "اضغط البطاقة لقلبها وإظهار الإجابة.",
+        mistakes: "الأخطاء",
+        allCards: "كل البطاقات",
+        quiz: "اختبار عشوائي",
+        noSection: "أضف قسمًا أولًا لتبدأ بإنشاء البطاقات.",
+        emptyCards: "لا توجد بطاقات في هذا القسم بعد.",
+        emptyMistakes: "لا توجد أخطاء محفوظة في هذا القسم.",
+        clickAnswer: "اضغط لإظهار الإجابة",
+        clickQuestion: "اضغط للعودة إلى السؤال",
+        edit: "تعديل",
+        delete: "حذف",
+        moveBack: "إعادة للبطاقات",
+        rename: "اكتب الاسم الجديد للقسم:",
+        confirmDelete: "هل تريد حذف القسم وكل بطاقاته وأخطائه؟",
+        lastSection: "أضف قسمًا آخر قبل حذف هذا القسم.",
+        cardNeedsSides: "أضف نصًا أو صورة لكل من السؤال والإجابة.",
+        saved: "تم حفظ البطاقة.",
+        saveError: "تعذّر الحفظ. قد تكون مساحة تخزين المتصفح ممتلئة.",
+        needTwoCards: "أضف بطاقتين على الأقل لبدء الاختبار.",
+        chooseAnswer: "اختر الإجابة الصحيحة:",
+        questionNumber: "السؤال",
+        correct: "إجابة صحيحة!",
+        incorrect: "إجابة غير صحيحة؛ أُضيف السؤال إلى الأخطاء.",
+        next: "التالي",
+        score: "النتيجة",
+        finished: "انتهى الاختبار",
+        startAgain: "اختبار جديد",
+        imageAnswer: "إجابة بصورة",
+        deleteConfirm: "هل تريد حذف هذه البطاقة؟",
+        languageButton: "English",
+        directionButton: "⇄ اتجاه الكتابة",
+        renameButton: "تسمية",
+        deleteSection: "حذف القسم",
+        flipHint: "اضغط على البطاقة لقلبها",
+        imageError: "تعذر عرض الصورة."
+      },
+      en: {
+        title: "My Study Cards",
+        subtitle: "Create sections and review your cards",
+        sections: "Study sections",
+        sectionsHint: "Create a section first, then select it to add cards.",
+        sectionPlaceholder: "Example: Physics",
+        addSection: "＋ Add section",
+        editor: "Add a card",
+        editEditor: "Edit card",
+        editorHint: "Add text or an image to the question and answer.",
+        question: "Question",
+        answer: "Answer",
+        questionPlaceholder: "Write the question here...",
+        answerPlaceholder: "Write the answer here...",
+        questionImage: "Question image (optional)",
+        answerImage: "Answer image (optional)",
+        imageHelp: "Images use your browser's available storage; the site does not impose a 2 MB limit.",
+        addCard: "Add card",
+        save: "Save changes",
+        cancel: "Cancel",
+        cards: "Cards",
+        listHint: "Click a card to flip it and reveal the answer.",
+        mistakes: "Mistakes",
+        allCards: "All cards",
+        quiz: "Random quiz",
+        noSection: "Add a section first to start creating cards.",
+        emptyCards: "There are no cards in this section yet.",
+        emptyMistakes: "There are no saved mistakes in this section.",
+        clickAnswer: "Click to reveal the answer",
+        clickQuestion: "Click to return to the question",
+        edit: "Edit",
+        delete: "Delete",
+        moveBack: "Move back to cards",
+        rename: "Enter the new section name:",
+        confirmDelete: "Delete this section and all its cards and mistakes?",
+        lastSection: "Add another section before deleting this one.",
+        cardNeedsSides: "Add text or an image for both the question and the answer.",
+        saved: "Card saved.",
+        saveError: "Could not save. Browser storage may be full.",
+        needTwoCards: "Add at least two cards to start a quiz.",
+        chooseAnswer: "Choose the correct answer:",
+        questionNumber: "Question",
+        correct: "Correct!",
+        incorrect: "Incorrect. The question was added to Mistakes.",
+        next: "Next",
+        score: "Score",
+        finished: "Quiz complete",
+        startAgain: "New quiz",
+        imageAnswer: "Image answer",
+        deleteConfirm: "Delete this card?",
+        languageButton: "العربية",
+        directionButton: "⇄ Text direction",
+        renameButton: "Rename",
+        deleteSection: "Delete section",
+        flipHint: "Click the card to flip it",
+        imageError: "Could not display the image."
+      }
+    };
+
+    const $ = id => document.getElementById(id);
+    const makeId = () => window.crypto?.randomUUID
+      ? crypto.randomUUID()
+      : "id-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(APP_KEY));
+        if (saved && Array.isArray(saved.sections)) {
+          saved.progress ||= {};
+          saved.language ||= "ar";
+          saved.direction ||= saved.language === "ar" ? "rtl" : "ltr";
+          saved.sections = saved.sections.map(section => ({
+            id: section.id || makeId(),
+            name: section.name || "قسم",
+            cards: Array.isArray(section.cards) ? section.cards : [],
+            mistakes: Array.isArray(section.mistakes) ? section.mistakes : []
+          }));
+          return saved;
+        }
+      } catch (error) {}
+      return {
+        sections: [],
+        activeSectionId: null,
+        language: "ar",
+        direction: "rtl",
+        progress: {}
       };
-      host.append(button);
-    });
-  }
-
-  async function renderCards() {
-    const host = \$("cardList");
-    host.replaceChildren();
-    const section = currentSection();
-    if (!section) return;
-    const cards = view === "mistakes" ? section.mistakes : section.cards;
-    if (!cards.length) {
-      const empty = document.createElement("div");
-      empty.className = "empty";
-      empty.textContent = view === "mistakes" ? t("emptyMistakes") : t("empty");
-      host.append(empty);
-      return;
     }
 
-    for (const card of cards) {
-      const wrap = document.createElement("article");
-      wrap.className = "card-wrap";
+    const state = loadState();
+    let view = "cards";
+    let editing = null;
+    let quiz = null;
+    let dbPromise = null;
+    const imageUrls = new Set();
 
-      const flip = document.createElement("div");
-      flip.className = "flip-card";
-      flip.tabIndex = 0;
-      flip.setAttribute("role", "button");
-      flip.setAttribute("aria-label", t("clickAnswer"));
+    const tr = key => text[state.language][key];
+    const currentSection = () =>
+      state.sections.find(section => section.id === state.activeSectionId) || null;
 
-      const front = document.createElement("div");
-      front.className = "face front";
-      front.innerHTML = `<div class="label">${escapeHtml(t("question"))} · ${escapeHtml(t("clickAnswer"))}</div>`;
-      await addContent(front, card.question, card.questionImage);
+    function saveState() {
+      try {
+        localStorage.setItem(APP_KEY, JSON.stringify(state));
+      } catch (error) {
+        setStatus(tr("saveError"));
+      }
+    }
 
-      const back = document.createElement("div");
-      back.className = "face back";
-      back.innerHTML = `<div class="label">${escapeHtml(t("answer"))} · ${escapeHtml(t("clickQuestion"))}</div>`;
-      await addContent(back, card.answer, card.answerImage);
+    function setStatus(message) {
+      $("statusText").textContent = message || "";
+    }
 
-      const toggle = () => flip.classList.toggle("flipped");
-      flip.onclick = toggle;
-      flip.onkeydown = e => {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
-      };
-      flip.append(front, back);
-      wrap.append(flip);
-
-      const actions = document.createElement("div");
-      actions.className = "card-actions";
-      const edit = document.createElement("button");
-      edit.className = "secondary";
-      edit.textContent = t("edit");
-      edit.onclick = () => beginEdit(card);
-      actions.append(edit);
-
-      if (view === "mistakes") {
-        const move = document.createElement("button");
-        move.className = "secondary";
-        move.textContent = t("moveBack");
-        move.onclick = () => moveMistakeBack(card.id);
-        actions.append(move);
+    function openImageDB() {
+      if (!("indexedDB" in window)) {
+        return Promise.reject(new Error("IndexedDB is unavailable"));
       }
 
-      const del = document.createElement("button");
-      del.className = "danger";
-      del.textContent = t("remove");
-      del.onclick = () => removeCard(card.id, view === "mistakes");
-      actions.append(del);
-      wrap.append(actions);
-      host.append(wrap);
-    }
-  }
+      if (!dbPromise) {
+        dbPromise = new Promise((resolve, reject) => {
+          const request = indexedDB.open(DB_NAME, 1);
 
-  async function addContent(face, content, imageId) {
-    if (content) {
-      const p = document.createElement("div");
-      p.className = "face-text";
-      p.textContent = content;
-      face.append(p);
-    }
-    if (imageId) {
-      try {
-        const url = await getImageUrl(imageId);
-        if (url) {
-          const img = document.createElement("img");
-          img.src = url;
-          img.alt = "";
-          face.append(img);
-        }
-      } catch (e) {}
-    }
-  }
+          request.onupgradeneeded = () => {
+            const db = request.result;
+            if (!db.objectStoreNames.contains(DB_STORE)) {
+              db.createObjectStore(DB_STORE);
+            }
+          };
 
-  function escapeHtml(value) {
-    return String(value).replace(/[&<>"']/g, ch => ({
-      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
-    }[ch]));
-  }
-
-  function render() {
-    updateLanguage();
-    renderTabs();
-    renderCards();
-    \$("showMistakesBtn").classList.toggle("hidden", view === "mistakes" || !!quiz);
-    \$("showCardsBtn").classList.toggle("hidden", view !== "mistakes" && !quiz);
-    \$("flipHint").classList.toggle("hidden", !!quiz);
-  }
-
-  function clearForm() {
-    \$("questionText").value = "";
-    \$("answerText").value = "";
-    \$("questionImage").value = "";
-    \$("answerImage").value = "";
-    editingId = null;
-    \$("cancelEditBtn").classList.add("hidden");
-    updateLanguage();
-  }
-
-  function beginEdit(card) {
-    editingId = card.id;
-    \$("questionText").value = card.question || "";
-    \$("answerText").value = card.answer || "";
-    \$("questionImage").value = "";
-    \$("answerImage").value = "";
-    \$("cancelEditBtn").classList.remove("hidden");
-    updateLanguage();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  \$("saveCardBtn").onclick = async () => {
-    const section = currentSection();
-    if (!section) return;
-    const question = \$("questionText").value.trim();
-    const answer = \$("answerText").value.trim();
-    const qFile = \$("questionImage").files[0];
-    const aFile = \$("answerImage").files[0];
-    if (!question && !qFile && !answer && !aFile) {
-      alert(t("noAnswer"));
-      return;
-    }
-    if ((!question && !qFile) || (!answer && !aFile)) {
-      alert(t("noAnswer"));
-      return;
-    }
-
-    \$("saveCardBtn").disabled = true;
-    \$("storageStatus").textContent = "...";
-    try {
-      let old = editingId ? section.cards.find(c => c.id === editingId) : null;
-      if (!old && editingId) old = section.mistakes.find(c => c.id === editingId);
-
-      const qImage = qFile ? await putImage(qFile) : (old?.questionImage || null);
-      const aImage = aFile ? await putImage(aFile) : (old?.answerImage || null);
-
-      if (old) {
-        old.question = question;
-        old.answer = answer;
-        old.questionImage = qImage;
-        old.answerImage = aImage;
-        if (qFile && old.questionImage !== qImage) await deleteImage(old.questionImage);
-        if (aFile && old.answerImage !== aImage) await deleteImage(old.answerImage);
-      } else {
-        section.cards.push({
-          id: uid(), question, answer, questionImage: qImage, answerImage: aImage
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
         });
       }
-      persist();
-      clearForm();
-      \$("storageStatus").textContent = t("saved");
-      render();
-    } catch (e) {
-      \$("storageStatus").textContent = t("imageError");
-      alert(t("imageError"));
-    } finally {
-      \$("saveCardBtn").disabled = false;
-    }
-  };
 
-  \$("cancelEditBtn").onclick = clearForm;
-
-  \$("addSectionBtn").onclick = () => {
-    const name = \$("newSectionName").value.trim();
-    if (!name) return;
-    const section = { id: uid(), name, cards: [], mistakes: [] };
-    state.sections.push(section);
-    activeSectionId = section.id;
-    \$("newSectionName").value = "";
-    view = "cards";
-    persist();
-    render();
-  };
-
-  \$("renameSectionBtn").onclick = () => {
-    const section = currentSection();
-    if (!section) return;
-    const name = prompt(t("sectionPrompt"), section.name);
-    if (name && name.trim()) {
-      section.name = name.trim();
-      persist();
-      render();
-    }
-  };
-
-  \$("deleteSectionBtn").onclick = async () => {
-    const section = currentSection();
-    if (!section || state.sections.length < 2) {
-      alert(language === "ar" ? "يجب أن يبقى قسم واحد على الأقل." : "At least one section must remain.");
-      return;
-    }
-    if (!confirm(t("confirmDelete"))) return;
-    for (const card of [...section.cards, ...section.mistakes]) {
-      await deleteImage(card.questionImage);
-      await deleteImage(card.answerImage);
-    }
-    state.sections = state.sections.filter(s => s.id !== section.id);
-    activeSectionId = state.sections[0].id;
-    view = "cards";
-    persist();
-    render();
-  };
-
-  function removeCard(id, fromMistakes) {
-    const section = currentSection();
-    const list = fromMistakes ? section.mistakes : section.cards;
-    const index = list.findIndex(c => c.id === id);
-    if (index < 0) return;
-    const card = list.splice(index, 1)[0];
-    deleteImage(card.questionImage);
-    deleteImage(card.answerImage);
-    persist();
-    render();
-  }
-
-  function moveMistakeBack(id) {
-    const section = currentSection();
-    const index = section.mistakes.findIndex(c => c.id === id);
-    if (index < 0) return;
-    const card = section.mistakes.splice(index, 1)[0];
-    if (!section.cards.some(c => c.id === card.id)) section.cards.push(card);
-    persist();
-    render();
-  }
-
-  \$("showMistakesBtn").onclick = () => {
-    view = "mistakes";
-    quiz = null;
-    \$("quizBox").classList.add("hidden");
-    \$("cardList").classList.remove("hidden");
-    render();
-  };
-
-  \$("showCardsBtn").onclick = () => {
-    view = "cards";
-    quiz = null;
-    \$("quizBox").classList.add("hidden");
-    \$("cardList").classList.remove("hidden");
-    render();
-  };
-
-  \$("languageBtn").onclick = () => {
-    language = language === "ar" ? "en" : "ar";
-    persist();
-    render();
-  };
-  \$("directionBtn").onclick = () => {
-    document.documentElement.dir =
-      document.documentElement.dir === "rtl" ? "ltr" : "rtl";
-  };
-
-  \$("startQuizBtn").onclick = () => {
-    const section = currentSection();
-    if (section.cards.length < 2) {
-      alert(t("needCards"));
-      return;
-    }
-    const order = section.cards.map(c => c.id).sort(() => Math.random() - .5);
-    quiz = { order, index: 0, score: 0, answered: false };
-    view = "cards";
-    \$("cardList").classList.add("hidden");
-    \$("quizBox").classList.remove("hidden");
-    \$("showCardsBtn").classList.remove("hidden");
-    \$("showMistakesBtn").classList.add("hidden");
-    renderQuizQuestion();
-  };
-
-  function renderQuizQuestion() {
-    const box = \$("quizBox");
-    box.replaceChildren();
-    const section = currentSection();
-    if (quiz.index >= quiz.order.length) {
-      const result = document.createElement("div");
-      result.className = "panel";
-      result.innerHTML = \`<h2>\${escapeHtml(t("finish"))}</h2>
-        <p>\${escapeHtml(t("score"))}: \${quiz.score} / \${quiz.order.length}</p>\`;
-      const again = document.createElement("button");
-      again.textContent = t("restart");
-      again.onclick = \$("startQuizBtn").onclick;
-      box.append(result, again);
-      state.progress[section.id] = {
-        score: quiz.score, total: quiz.order.length, date: new Date().toISOString()
-      };
-      persist();
-      return;
+      return dbPromise;
     }
 
-    const card = section.cards.find(c => c.id === quiz.order[quiz.index]);
-    const panel = document.createElement("div");
-    panel.className = "panel";
-    const heading = document.createElement("h2");
-    heading.textContent = `${t("questionNumber")} ${quiz.index + 1} / ${quiz.order.length}`;
-    const prompt = document.createElement("p");
-    prompt.textContent = t("choose");
-    const question = document.createElement("div");
-    question.className = "face-text";
-    question.style.textAlign = "center";
-    question.textContent = card.question;
-    panel.append(heading, prompt, question);
-    if (card.questionImage) {
-      getImageUrl(card.questionImage).then(url => {
-        if (url) {
-          const img = document.createElement("img");
-          img.src = url; img.alt = ""; img.style.cssText = "display:block;max-width:100%;max-height:220px;margin:12px auto";
-          panel.append(img);
-        }
+    async function saveImage(file) {
+      if (!file) return null;
+      const db = await openImageDB();
+      const id = makeId();
+
+      await new Promise((resolve, reject) => {
+        const transaction = db.transaction(DB_STORE, "readwrite");
+        transaction.objectStore(DB_STORE).put(file, id);
+        transaction.oncomplete = resolve;
+        transaction.onerror = () => reject(transaction.error);
+        transaction.onabort = () => reject(transaction.error);
       });
+
+      return id;
     }
 
-    const options = document.createElement("div");
-    options.className = "quiz-options";
-    const distractors = section.cards.filter(c => c.id !== card.id)
-      .sort(() => Math.random() - .5).slice(0, 3);
-    const choices = [card, ...distractors].sort(() => Math.random() - .5);
-    const feedback = document.createElement("div");
-    feedback.className = "feedback";
+    async function getImageUrl(id) {
+      if (!id) return null;
+      const db = await openImageDB();
 
-    choices.forEach(choice => {
-      const btn = document.createElement("button");
-      btn.className = "secondary";
-      btn.textContent = choice.answer || (language === "ar" ? "إجابة مصورة" : "Image answer");
-      btn.onclick = () => {
-        if (quiz.answered) return;
-        quiz.answered = true;
-        if (choice.id === card.id) {
-          quiz.score++;
-          feedback.textContent = t("correct");
-          feedback.style.color = "green";
-        } else {
-          feedback.textContent = t("incorrect");
-          feedback.style.color = "#b42318";
-          if (!section.mistakes.some(c => c.id === card.id))
-            section.mistakes.push(card);
-          persist();
+      const blob = await new Promise((resolve, reject) => {
+        const request = db.transaction(DB_STORE, "readonly")
+          .objectStore(DB_STORE).get(id);
+
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error);
+      });
+
+      if (!blob) return null;
+      const url = URL.createObjectURL(blob);
+      imageUrls.add(url);
+      return url;
+    }
+
+    async function removeImage(id) {
+      if (!id) return;
+
+      try {
+        const db = await openImageDB();
+        await new Promise((resolve, reject) => {
+          const transaction = db.transaction(DB_STORE, "readwrite");
+          transaction.objectStore(DB_STORE).delete(id);
+          transaction.oncomplete = resolve;
+          transaction.onerror = () => reject(transaction.error);
+        });
+      } catch (error) {}
+    }
+
+    function updateText() {
+      document.documentElement.lang = state.language;
+      document.documentElement.dir = state.direction;
+
+      $("appTitle").textContent = tr("title");
+      $("appSubtitle").textContent = tr("subtitle");
+      $("sectionsTitle").textContent = tr("sections");
+      $("sectionsHint").textContent = tr("sectionsHint");
+      $("newSectionInput").placeholder = tr("sectionPlaceholder");
+      $("addSectionBtn").textContent = tr("addSection");
+
+      $("editorTitle").textContent = editing ? tr("editEditor") : tr("editor");
+      $("editorSubtitle").textContent = tr("editorHint");
+      $("questionLabel").textContent = tr("question");
+      $("answerLabel").textContent = tr("answer");
+      $("questionText").placeholder = tr("questionPlaceholder");
+      $("answerText").placeholder = tr("answerPlaceholder");
+      $("questionImageLabel").textContent = tr("questionImage");
+      $("answerImageLabel").textContent = tr("answerImage");
+      $("imageHelp").textContent = tr("imageHelp");
+      $("saveCardBtn").textContent = editing ? tr("save") : tr("addCard");
+      $("cancelEditBtn").textContent = tr("cancel");
+
+      $("languageBtn").textContent = tr("languageButton");
+      $("directionBtn").textContent = tr("directionButton");
+      $("quizBtn").textContent = tr("quiz");
+      $("mistakesBtn").textContent = tr("mistakes");
+      $("backToCardsBtn").textContent = tr("allCards");
+    }
+
+    function renderSections() {
+      const host = $("sectionTabs");
+      host.replaceChildren();
+
+      for (const section of state.sections) {
+        const group = document.createElement("div");
+        group.className = "row";
+
+        const tab = document.createElement("button");
+        tab.type = "button";
+        tab.className = "section-tab" +
+          (section.id === state.activeSectionId ? " active" : "");
+        tab.textContent = section.name;
+
+        tab.onclick = () => {
+          state.activeSectionId = section.id;
+          view = "cards";
+          quiz = null;
+          cancelEdit();
+          saveState();
+          render();
+        };
+
+        group.append(tab);
+
+        if (section.id === state.activeSectionId) {
+          const rename = document.createElement("button");
+          rename.type = "button";
+          rename.className = "btn ghost small";
+          rename.textContent = tr("renameButton");
+          rename.onclick = () => {
+            const name = prompt(tr("rename"), section.name);
+            if (name && name.trim()) {
+              section.name = name.trim();
+              saveState();
+              renderSections();
+            }
+          };
+
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "btn danger small";
+          remove.textContent = tr("deleteSection");
+          remove.onclick = () => deleteSection(section);
+
+          group.append(rename, remove);
         }
-        [...options.querySelectorAll("button")].forEach(b => b.disabled = true);
-        next.hidden = false;
+
+        host.append(group);
+      }
+    }
+
+    async function addSideContent(face, content, imageId) {
+      if (content) {
+        const textNode = document.createElement("div");
+        textNode.className = "face-content";
+        textNode.textContent = content;
+        face.append(textNode);
+      }
+
+      if (imageId) {
+        try {
+          const url = await getImageUrl(imageId);
+          if (url) {
+            const image = document.createElement("img");
+            image.className = "card-image";
+            image.src = url;
+            image.alt = "";
+            face.append(image);
+          }
+        } catch (error) {
+          const message = document.createElement("div");
+          message.className = "muted";
+          message.textContent = tr("imageError");
+          face.append(message);
+        }
+      }
+    }
+
+    async function renderCards() {
+      const host = $("cardList");
+      host.replaceChildren();
+
+      const section = currentSection();
+
+      if (!section) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = tr("noSection");
+        host.append(empty);
+        return;
+      }
+
+      const list = view === "mistakes" ? section.mistakes : section.cards;
+
+      if (!list.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = view === "mistakes" ? tr("emptyMistakes") : tr("emptyCards");
+        host.append(empty);
+        return;
+      }
+
+      for (const card of [...list]) {
+        const shell = document.createElement("article");
+        const scene = document.createElement("div");
+        const flip = document.createElement("div");
+        const questionFace = document.createElement("div");
+        const answerFace = document.createElement("div");
+
+        shell.className = "card-shell";
+        scene.className = "flip-scene";
+        flip.className = "flashcard";
+        flip.tabIndex = 0;
+        flip.setAttribute("role", "button");
+        flip.setAttribute("aria-label", tr("clickAnswer"));
+
+        questionFace.className = "card-face question-face";
+        answerFace.className = "card-face answer-face";
+
+        const qLabel = document.createElement("div");
+        qLabel.className = "face-label";
+        qLabel.textContent = tr("question");
+        questionFace.append(qLabel);
+        await addSideContent(questionFace, card.question, card.questionImage);
+
+        const aLabel = document.createElement("div");
+        aLabel.className = "face-label";
+        aLabel.textContent = tr("answer");
+        answerFace.append(aLabel);
+        await addSideContent(answerFace, card.answer, card.answerImage);
+
+        const toggle = () => {
+          flip.classList.toggle("is-flipped");
+          flip.setAttribute(
+            "aria-label",
+            flip.classList.contains("is-flipped") ? tr("clickQuestion") : tr("clickAnswer")
+          );
+        };
+
+        flip.onclick = toggle;
+        flip.onkeydown = event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            toggle();
+          }
+        };
+
+        flip.append(questionFace, answerFace);
+        scene.append(flip);
+
+        const hint = document.createElement("div");
+        hint.className = "flip-hint";
+        hint.textContent = tr("flipHint");
+
+        const actions = document.createElement("div");
+        actions.className = "card-actions";
+
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.className = "btn secondary small";
+        editButton.textContent = tr("edit");
+        editButton.onclick = () => beginEdit(card);
+        actions.append(editButton);
+
+        if (view === "mistakes") {
+          const moveButton = document.createElement("button");
+          moveButton.type = "button";
+          moveButton.className = "btn secondary small";
+          moveButton.textContent = tr("moveBack");
+          moveButton.onclick = () => moveMistakeBack(card.id);
+          actions.append(moveButton);
+        }
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "btn danger small";
+        deleteButton.textContent = tr("delete");
+        deleteButton.onclick = () => deleteCard(card.id);
+        actions.append(deleteButton);
+
+        shell.append(scene, hint, actions);
+        host.append(shell);
+      }
+    }
+
+    function render() {
+      updateText();
+      renderSections();
+
+      const hasSection = !!currentSection();
+
+      $("editorPanel").classList.toggle("hidden", !hasSection || !!quiz);
+      $("quizBtn").classList.toggle("hidden", !hasSection || !!quiz);
+      $("mistakesBtn").classList.toggle(
+        "hidden", !hasSection || view === "mistakes" || !!quiz
+      );
+      $("backToCardsBtn").classList.toggle(
+        "hidden", !hasSection || (view !== "mistakes" && !quiz)
+      );
+
+      $("cardList").classList.toggle("hidden", !!quiz);
+      $("quizArea").classList.toggle("hidden", !quiz);
+      $("listTitle").textContent = view === "mistakes" && !quiz
+        ? tr("mistakes")
+        : tr("cards");
+      $("listSubtitle").textContent = quiz ? tr("chooseAnswer") : tr("listHint");
+
+      renderCards();
+      if (quiz) renderQuizQuestion();
+    }
+
+    function resetForm() {
+      $("questionText").value = "";
+      $("answerText").value = "";
+      $("questionImage").value = "";
+      $("answerImage").value = "";
+    }
+
+    function cancelEdit() {
+      editing = null;
+      resetForm();
+      $("cancelEditBtn").classList.add("hidden");
+    }
+
+    function findCard(section, id) {
+      return [...section.cards, ...section.mistakes]
+        .find(card => card.id === id) || null;
+    }
+
+    function beginEdit(card) {
+      editing = { cardId: card.id };
+      $("questionText").value = card.question || "";
+      $("answerText").value = card.answer || "";
+      $("questionImage").value = "";
+      $("answerImage").value = "";
+      $("cancelEditBtn").classList.remove("hidden");
+      updateText();
+      $("editorPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    $("addSectionBtn").onclick = () => {
+      const name = $("newSectionInput").value.trim();
+      if (!name) {
+        $("newSectionInput").focus();
+        return;
+      }
+
+      const section = {
+        id: makeId(),
+        name,
+        cards: [],
+        mistakes: []
       };
-      options.append(btn);
+
+      state.sections.push(section);
+      state.activeSectionId = section.id;
+      $("newSectionInput").value = "";
+      view = "cards";
+      quiz = null;
+      saveState();
+      render();
+    };
+
+    $("newSectionInput").addEventListener("keydown", event => {
+      if (event.key === "Enter") $("addSectionBtn").click();
     });
 
-    const next = document.createElement("button");
-    next.textContent = t("next");
-    next.hidden = true;
-    next.onclick = () => {
-      quiz.index++;
-      quiz.answered = false;
-      renderQuizQuestion();
+    async function deleteSection(section) {
+      if (state.sections.length <= 1) {
+        alert(tr("lastSection"));
+        return;
+      }
+
+      if (!confirm(tr("confirmDelete"))) return;
+
+      for (const card of [...section.cards, ...section.mistakes]) {
+        await removeImage(card.questionImage);
+        await removeImage(card.answerImage);
+      }
+
+      state.sections = state.sections.filter(item => item.id !== section.id);
+      delete state.progress[section.id];
+      state.activeSectionId = state.sections[0]?.id || null;
+      view = "cards";
+      quiz = null;
+      cancelEdit();
+      saveState();
+      render();
+    }
+
+    $("saveCardBtn").onclick = async () => {
+      const section = currentSection();
+      if (!section) return;
+
+      const question = $("questionText").value.trim();
+      const answer = $("answerText").value.trim();
+      const qFile = $("questionImage").files[0] || null;
+      const aFile = $("answerImage").files[0] || null;
+      const oldCard = editing ? findCard(section, editing.cardId) : null;
+
+      const hasQuestion = question || qFile || oldCard?.questionImage;
+      const hasAnswer = answer || aFile || oldCard?.answerImage;
+
+      if (!hasQuestion || !hasAnswer) {
+        alert(tr("cardNeedsSides"));
+        return;
+      }
+
+      const button = $("saveCardBtn");
+      button.disabled = true;
+      setStatus(state.language === "ar" ? "جارٍ الحفظ..." : "Saving...");
+
+      try {
+        let questionImage = oldCard?.questionImage || null;
+        let answerImage = oldCard?.answerImage || null;
+
+        if (qFile) questionImage = await saveImage(qFile);
+        if (aFile) answerImage = await saveImage(aFile);
+
+        if (oldCard) {
+          const previousQuestionImage = oldCard.questionImage;
+          const previousAnswerImage = oldCard.answerImage;
+
+          oldCard.question = question;
+          oldCard.answer = answer;
+          oldCard.questionImage = questionImage;
+          oldCard.answerImage = answerImage;
+
+          if (qFile && previousQuestionImage) await removeImage(previousQuestionImage);
+          if (aFile && previousAnswerImage) await removeImage(previousAnswerImage);
+        } else {
+          section.cards.push({
+            id: makeId(),
+            question,
+            answer,
+            questionImage,
+            answerImage
+          });
+        }
+
+        saveState();
+        cancelEdit();
+        view = "cards";
+        setStatus(tr("saved"));
+        render();
+      } catch (error) {
+        console.error(error);
+        setStatus(tr("saveError"));
+        alert(tr("saveError"));
+      } finally {
+        button.disabled = false;
+      }
     };
-    box.append(panel, options, feedback, next);
-  }
 
-  function render() {
-    updateLanguage();
-    renderTabs();
-    renderCards();
-    \$("showMistakesBtn").classList.toggle("hidden", view === "mistakes" || !!quiz);
-    \$("showCardsBtn").classList.toggle("hidden", view !== "mistakes" && !quiz);
-    \$("flipHint").classList.toggle("hidden", !!quiz);
-  }
+    $("cancelEditBtn").onclick = () => {
+      cancelEdit();
+      render();
+    };
 
-  // إعادة ضبط عنصر الملف تسمح باختيار نفس الصورة مرة أخرى.
-  \$("questionImage").addEventListener("click", e => { e.currentTarget.value = ""; });
-  \$("answerImage").addEventListener("click", e => { e.currentTarget.value = ""; });
+    async function deleteCard(id) {
+      const section = currentSection();
+      if (!section || !confirm(tr("deleteConfirm"))) return;
 
-  window.addEventListener("beforeunload", () => {
-    for (const url of objectUrls) URL.revokeObjectURL(url);
-  });
+      for (const list of [section.cards, section.mistakes]) {
+        const index = list.findIndex(card => card.id === id);
+        if (index !== -1) {
+          const [card] = list.splice(index, 1);
+          await removeImage(card.questionImage);
+          await removeImage(card.answerImage);
+        }
+      }
 
-  if (!state.progress) state.progress = {};
-  if (!state.sections.length) {
-    const section = { id: uid(), name: "عام", cards: [], mistakes: [] };
-    state.sections.push(section);
-    activeSectionId = section.id;
-  }
-  if (!state.sections.some(s => s.id === activeSectionId))
-    activeSectionId = state.sections[0].id;
+      saveState();
+      render();
+    }
 
-  persist();
-  render();
-})();
-</script>
+    function moveMistakeBack(id) {
+      const section = currentSection();
+      if (!section) return;
+
+      const index = section.mistakes.findIndex(card => card.id === id);
+      if (index < 0) return;
+
+      const [card] = section.mistakes.splice(index, 1);
+      if (!section.cards.some(item => item.id === card.id)) {
+        section.cards.push(card);
+      }
+
+      saveState();
+      render();
+    }
+
+    $("mistakesBtn").onclick = () => {
+      view = "mistakes";
+      quiz = null;
+      render();
+    };
+
+    $("backToCardsBtn").onclick = () => {
+      view = "cards";
+      quiz = null;
+      render();
+    };
+
+    $("languageBtn").onclick = () => {
+      state.language = state.language === "ar" ? "en" : "ar";
+      state.direction = state.language === "ar" ? "rtl" : "ltr";
+      saveState();
+      render();
+    };
+
+    $("directionBtn").onclick = () => {
+      state.direction = state.direction === "rtl" ? "ltr" : "rtl";
+      saveState();
+      render();
+    };
+
+    function shuffle(items) {
+      const copy = [...items];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    $("quizBtn").onclick = startQuiz;
+
+    function startQuiz() {
+      const section = currentSection();
+      if (!section) return;
+
+      if (section.cards.length < 2) {
+        alert(tr("needTwoCards"));
+        return;
+      }
+
+      quiz = {
+        ids: shuffle(section.cards.map(card => card.id)),
+        index: 0,
+        score: 0
+      };
+
+      render();
+    }
+
+    async function renderQuizQuestion() {
+      if (!quiz) return;
+
+      const area = $("quizArea");
+      area.replaceChildren();
+
+      const section = currentSection();
+      if (!section) return;
+
+      if (quiz.index >= quiz.ids.length) {
+        const result = document.createElement("div");
+        result.className = "quiz-question";
+
+        const heading = document.createElement("h2");
+        heading.textContent = tr("finished");
+
+        const score = document.createElement("p");
+        score.textContent = `${tr("score")}: ${quiz.score} / ${quiz.ids.length}`;
+
+        const again = document.createElement("button");
+        again.type = "button";
+        again.className = "btn";
+        again.textContent = tr("startAgain");
+        again.onclick = startQuiz;
+
+        const exit = document.createElement("button");
+        exit.type = "button";
+        exit.className = "btn secondary";
+        exit.style.marginInlineStart = "8px";
+        exit.textContent = tr("allCards");
+        exit.onclick = () => {
+          quiz = null;
+          view = "cards";
+          render();
+        };
+
+        result.append(heading, score, again, exit);
+        area.append(result);
+
+        state.progress[section.id] = {
+          score: quiz.score,
+          total: quiz.ids.length,
+          date: new Date().toISOString()
+        };
+        saveState();
+        return;
+      }
+
+      const card = section.cards.find(item => item.id === quiz.ids[quiz.index]);
+      if (!card) {
+        quiz.index++;
+        renderQuizQuestion();
+        return;
+      }
+
+      const questionBox = document.createElement("div");
+      questionBox.className = "quiz-question";
+
+      const counter = document.createElement("div");
+      counter.className = "quiz-counter";
+      counter.textContent = `${tr("questionNumber")} ${quiz.index + 1} / ${quiz.ids.length}`;
+
+      const prompt = document.createElement("div");
+      prompt.className = "quiz-prompt";
+      prompt.textContent = card.question || "";
+      questionBox.append(counter, prompt);
+
+      if (card.questionImage) {
+        try {
+          const url = await getImageUrl(card.questionImage);
+          if (url && quiz) {
+            const image = document.createElement("img");
+            image.src = url;
+            image.alt = "";
+            prompt.append(image);
+          }
+        } catch (error) {}
+      }
+
+      const choose = document.createElement("div");
+      choose.className = "muted";
+      choose.textContent = tr("chooseAnswer");
+
+      const optionsBox = document.createElement("div");
+      optionsBox.className = "quiz-options";
+
+      const feedback = document.createElement("div");
+      feedback.className = "feedback";
+
+      const wrongAnswers = shuffle(
+        section.cards.filter(item => item.id !== card.id)
+      ).slice(0, 3);
+
+      const options = shuffle([card, ...wrongAnswers]);
+      let answered = false;
+
+      for (const option of options) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "quiz-option";
+        button.textContent = option.answer || tr("imageAnswer");
+
+        if (option.answerImage) {
+          try {
+            const url = await getImageUrl(option.answerImage);
+            if (url) {
+              const image = document.createElement("img");
+              image.src = url;
+              image.alt = "";
+              image.style.cssText =
+                "display:block;max-width:100%;max-height:110px;margin-top:8px";
+              button.append(image);
+            }
+          } catch (error) {}
+        }
+
+        button.onclick = () => {
+          if (answered) return;
+          answered = true;
+
+          if (option.id === card.id) {
+            quiz.score++;
+            feedback.textContent = tr("correct");
+            feedback.className = "feedback correct";
+          } else {
+            feedback.textContent = tr("incorrect");
+            feedback.className = "feedback incorrect";
+
+            if (!section.mistakes.some(item => item.id === card.id)) {
+              section.mistakes.push(card);
+            }
+            saveState();
+          }
+
+          optionsBox.querySelectorAll("button").forEach(item => {
+            item.disabled = true;
+          });
+          nextButton.hidden = false;
+        };
+
+        optionsBox.append(button);
+      }
+
+      const nextButton = document.createElement("button");
+      nextButton.type = "button";
+      nextButton.className = "btn";
+      nextButton.textContent = tr("next");
+      nextButton.hidden = true;
+      nextButton.onclick = () => {
+        quiz.index++;
+        renderQuizQuestion();
+      };
+
+      area.append(questionBox, choose, optionsBox, feedback, nextButton);
+    }
+
+    window.addEventListener("beforeunload", () => {
+      for (const url of imageUrls) URL.revokeObjectURL(url);
+    });
+
+    render();
+  </script>
 </body>
 </html>
