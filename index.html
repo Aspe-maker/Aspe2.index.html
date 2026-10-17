@@ -4,384 +4,987 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>بطاقاتي التعليمية</title>
+
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    body { margin: 0; background: #f3f4f6; color: #111827; }
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
     header {
-      padding: 18px 5%; background: #6366f1; color: white;
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 12px; flex-wrap: wrap;
+      padding: 18px 5%;
+      background: #6366f1;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
-    button { border: 0; border-radius: 8px; padding: 10px 14px; cursor: pointer; }
-    button:hover { opacity: .88; }
-    input, textarea { width: 100%; padding: 11px; border: 1px solid #d1d5db; border-radius: 8px; }
-    .layout { max-width: 1200px; margin: 24px auto; padding: 0 16px; display: grid; grid-template-columns: 270px 1fr; gap: 20px; }
-    .panel { background: white; padding: 20px; border-radius: 14px; box-shadow: 0 4px 15px #0000000d; }
-    .add-section { display: flex; gap: 8px; margin: 14px 0; }
-    .primary { background: #6366f1; color: white; }
-    .secondary { background: #e5e7eb; color: #111827; }
-    .good { background: #10b981; color: white; }
-    .bad { background: #ef4444; color: white; }
-    .sections { list-style: none; padding: 0; display: grid; gap: 8px; }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: .88;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font: inherit;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .layout {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      gap: 20px;
+    }
+
+    .panel {
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px #0000000d;
+    }
+
+    .add-section {
+      display: flex;
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .primary {
+      background: #6366f1;
+      color: white;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .good {
+      background: #10b981;
+      color: white;
+    }
+
+    .bad {
+      background: #ef4444;
+      color: white;
+    }
+
+    .sections {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+    }
+
     .section {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px; background: #f9fafb; border: 1px solid transparent;
-      border-radius: 8px; cursor: pointer; gap: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: #f9fafb;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      gap: 6px;
     }
-    .section.active { border-color: #6366f1; background: #eef2ff; }
-    .section-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
-    .delete-small { background: transparent; color: #ef4444; padding: 4px 8px; }
-    .toolbar, .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .toolbar { justify-content: space-between; }
-    .card-wrap { display: grid; place-items: center; margin: 22px 0; perspective: 1000px; }
-    .flashcard { width: min(100%, 620px); min-height: 300px; position: relative; cursor: pointer; transform-style: preserve-3d; transition: transform .55s; }
-    .flashcard.flipped { transform: rotateY(180deg); }
-    .face {
-      position: absolute; inset: 0; min-height: 300px; padding: 35px;
-      border-radius: 18px; color: white; display: flex; flex-direction: column;
-      justify-content: center; align-items: center; text-align: center;
-      backface-visibility: hidden; box-shadow: 0 8px 22px #0002;
-      font-size: 22px; line-height: 1.5; overflow-wrap: anywhere;
+
+    .section.active {
+      border-color: #6366f1;
+      background: #eef2ff;
     }
-    .front { background: linear-gradient(135deg,#6366f1,#8b5cf6); }
-    .back { background: linear-gradient(135deg,#10b981,#059669); transform: rotateY(180deg); }
-    .face img { max-width: 100%; max-height: 180px; object-fit: contain; border-radius: 8px; margin-top: 10px; }
-    .face-label { position: absolute; top: 12px; inset-inline-start: 16px; opacity: .8; font-size: 14px; }
-    .muted { color: #6b7280; text-align: center; }
-    .progress { height: 9px; background: #e5e7eb; border-radius: 20px; overflow: hidden; margin: 15px 0; }
-    .progress div { height: 100%; background: #10b981; }
-    .modal { display: none; position: fixed; inset: 0; background: #0008; z-index: 5; padding: 18px; align-items: center; justify-content: center; }
-    .modal.show { display: flex; }
-    .modal-box { width: min(100%, 560px); max-height: 90vh; overflow: auto; background: white; padding: 22px; border-radius: 14px; }
-    .field { margin: 14px 0; }
-    .field label { display: block; margin-bottom: 7px; font-weight: bold; }
-    .preview { max-width: 150px; max-height: 100px; display: block; object-fit: contain; margin-top: 8px; }
-    .empty { text-align: center; padding: 65px 10px; color: #6b7280; }
-    .quiz-box { text-align: center; padding: 25px 10px; }
-    .quiz-question { font-size: 23px; margin: 20px 0; }
-    .quiz-question img { display: block; max-width: min(100%, 350px); max-height: 220px; margin: 12px auto; }
-    .quiz-options { display: grid; gap: 10px; max-width: 650px; margin: 20px auto; }
-    .quiz-option { background: #eef2ff; text-align: start; padding: 14px; }
-    @media(max-width: 760px) { .layout { grid-template-columns: 1fr; } .flashcard, .face { min-height: 260px; } }
+
+    .section-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .delete-small {
+      background: transparent;
+      color: #ef4444;
+      padding: 4px 8px;
+    }
+
+    .toolbar,
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .toolbar {
+      justify-content: space-between;
+    }
+
+    .muted {
+      color: #6b7280;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 60px 10px;
+      color: #6b7280;
+    }
+
+    .progress {
+      height: 9px;
+      background: #e5e7eb;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .progress div {
+      height: 100%;
+      background: #10b981;
+    }
+
+    .cards-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .stacked-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .stacked-card h3 {
+      margin: 12px 0 7px;
+      color: #6366f1;
+    }
+
+    .stacked-card p {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      margin: 8px 0;
+      line-height: 1.5;
+    }
+
+    .stacked-card img,
+    .mistake-item img {
+      display: block;
+      max-width: 100%;
+      max-height: 240px;
+      object-fit: contain;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+
+    .card-number {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #0008;
+      z-index: 5;
+      padding: 18px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-box {
+      width: min(100%, 560px);
+      max-height: 90vh;
+      overflow: auto;
+      background: white;
+      padding: 22px;
+      border-radius: 14px;
+    }
+
+    .field {
+      margin: 14px 0;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    .field input[type="file"] {
+      margin-top: 8px;
+    }
+
+    .preview {
+      max-width: 180px;
+      max-height: 130px;
+      display: block;
+      object-fit: contain;
+      margin-top: 8px;
+    }
+
+    .quiz-box {
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    .quiz-question {
+      font-size: 22px;
+      margin: 24px 0;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .quiz-question img {
+      display: block;
+      max-width: min(100%, 400px);
+      max-height: 240px;
+      margin: 12px auto;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 10px;
+      max-width: 700px;
+      margin: 20px auto;
+    }
+
+    .quiz-option {
+      background: #eef2ff;
+      text-align: start;
+      line-height: 1.5;
+    }
+
+    .quiz-option img {
+      display: block;
+      max-width: 180px;
+      max-height: 120px;
+      margin-top: 8px;
+    }
+
+    .mistake-item {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 0;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 760px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
+
 <body>
-<header>
-  <h1 id="appTitle"></h1>
-  <button class="secondary" onclick="toggleLanguage()" id="langBtn"></button>
-</header>
+  <header>
+    <h1 id="appTitle"></h1>
+    <button class="secondary" onclick="toggleLanguage()" id="langBtn"></button>
+  </header>
 
-<main class="layout">
-  <aside class="panel">
-    <h2 id="sectionsTitle"></h2>
-    <div class="add-section">
-      <input id="sectionInput">
-      <button class="primary" onclick="addSection()">+</button>
-    </div>
-    <ul class="sections" id="sectionList"></ul>
-  </aside>
-  <section class="panel" id="main"></section>
-</main>
+  <main class="layout">
+    <aside class="panel">
+      <h2 id="sectionsTitle"></h2>
 
-<div class="modal" id="modal">
-  <div class="modal-box">
-    <h2 id="modalTitle"></h2>
-    <div class="field">
-      <label id="questionLabel"></label>
-      <textarea id="questionText" rows="3"></textarea>
-      <input id="questionImage" type="file" accept="image/*" onchange="loadImage('question')">
-      <img id="questionPreview" class="preview" hidden>
-      <button class="delete-small" onclick="clearImage('question')" id="removeQuestionImage"></button>
-    </div>
-    <div class="field">
-      <label id="answerLabel"></label>
-      <textarea id="answerText" rows="3"></textarea>
-      <input id="answerImage" type="file" accept="image/*" onchange="loadImage('answer')">
-      <img id="answerPreview" class="preview" hidden>
-      <button class="delete-small" onclick="clearImage('answer')" id="removeAnswerImage"></button>
-    </div>
-    <div class="actions" style="justify-content:flex-end">
-      <button class="secondary" onclick="closeModal()" id="cancelBtn"></button>
-      <button class="primary" onclick="saveCard()" id="saveBtn"></button>
+      <div class="add-section">
+        <input id="sectionInput">
+        <button class="primary" onclick="addSection()">+</button>
+      </div>
+
+      <ul class="sections" id="sectionList"></ul>
+    </aside>
+
+    <section class="panel" id="main"></section>
+  </main>
+
+  <div class="modal" id="modal">
+    <div class="modal-box">
+      <h2 id="modalTitle"></h2>
+
+      <div class="field">
+        <label id="questionLabel"></label>
+        <textarea id="questionText" rows="3"></textarea>
+        <input id="questionImage" type="file" accept="image/*">
+        <img id="questionPreview" class="preview" hidden>
+        <button class="delete-small" type="button"
+          onclick="clearImage('question')" id="removeQuestionImage"></button>
+      </div>
+
+      <div class="field">
+        <label id="answerLabel"></label>
+        <textarea id="answerText" rows="3"></textarea>
+        <input id="answerImage" type="file" accept="image/*">
+        <img id="answerPreview" class="preview" hidden>
+        <button class="delete-small" type="button"
+          onclick="clearImage('answer')" id="removeAnswerImage"></button>
+      </div>
+
+      <div class="actions" style="justify-content:flex-end">
+        <button class="secondary" onclick="closeModal()" id="cancelBtn"></button>
+        <button class="primary" onclick="saveCard()" id="saveBtn"></button>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-const KEY = "flash_cards_v2";
-let lang = localStorage.getItem("flash_lang") || "ar";
-let db = JSON.parse(localStorage.getItem(KEY)) || { sections: [], selected: null };
-let index = 0, editingId = null, imageData = { question: "", answer: "" };
-let quiz = null;
+  <script>
+    const STORAGE_KEY = "flash_cards_complete_v1";
 
-const words = {
-  ar: {
-    title:"بطاقاتي التعليمية", sections:"المواد والأقسام", sectionPlaceholder:"اسم القسم",
-    addSection:"أضف قسمًا للبدء", addCard:"إضافة بطاقة", question:"السؤال",
-    answer:"الإجابة", card:"بطاقة", progress:"التقدم", previous:"السابق",
-    next:"التالي", knew:"عرفتها", forgot:"لم أتذكرها", edit:"تعديل",
-    delete:"حذف", flip:"اضغط على البطاقة لقلبها", noCards:"لا توجد بطاقات هنا.",
-    errors:"الأخطاء", startQuiz:"ابدأ الاختبار", quizTitle:"اختبار",
-    noQuiz:"لا توجد بطاقات للاختبار في هذا القسم.", finish:"إنهاء الاختبار",
-    correct:"إجابة صحيحة!", wrong:"إجابة خاطئة — أضيفت إلى الأخطاء.",
-    result:"انتهى الاختبار. النتيجة", of:"من", retry:"اختبار جديد",
-    addToCards:"إخراج من الأخطاء وإعادتها للبطاقات", removeError:"حذف من الأخطاء",
-    addTitle:"إضافة بطاقة", editTitle:"تعديل البطاقة", cancel:"إلغاء",
-    save:"حفظ", removeImage:"إزالة الصورة", empty:"أضف نصًا أو صورة للسؤال وللإجابة.",
-    confirmSection:"حذف القسم وجميع بطاقاته؟", confirmCard:"حذف البطاقة؟",
-    errorCount:"سؤال في الأخطاء", imageTooLarge:"الصورة كبيرة. اختر صورة أصغر من 2 ميغابايت.",
-    answerPlaceholder:"اكتب الإجابة (اختياري إذا أضفت صورة)"
-  },
-  en: {
-    title:"My Flash Cards", sections:"Subjects & Sections", sectionPlaceholder:"Section name",
-    addSection:"Add a section to start", addCard:"Add card", question:"Question",
-    answer:"Answer", card:"Card", progress:"Progress", previous:"Previous",
-    next:"Next", knew:"I knew it", forgot:"I forgot", edit:"Edit",
-    delete:"Delete", flip:"Click the card to flip", noCards:"No cards here.",
-    errors:"Mistakes", startQuiz:"Start quiz", quizTitle:"Quiz",
-    noQuiz:"No cards available for a quiz.", finish:"Finish quiz",
-    correct:"Correct!", wrong:"Wrong answer — added to mistakes.",
-    result:"Quiz finished. Score", of:"of", retry:"New quiz",
-    addToCards:"Remove from mistakes and restore card", removeError:"Delete from mistakes",
-    addTitle:"Add card", editTitle:"Edit card", cancel:"Cancel",
-    save:"Save", removeImage:"Remove image", empty:"Add text or an image for both question and answer.",
-    confirmSection:"Delete this section and all its cards?", confirmCard:"Delete this card?",
-    errorCount:"questions in mistakes", imageTooLarge:"Image is too large. Choose an image under 2 MB.",
-    answerPlaceholder:"Enter answer (optional if you add an image)"
-  }
-};
-const t = key => words[lang][key];
-const id = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
-const save = () => localStorage.setItem(KEY, JSON.stringify(db));
-const section = () => db.sections.find(s => s.id === db.selected);
+    let lang = localStorage.getItem("flash_cards_language") || "ar";
+    let db = loadData();
+    let editingId = null;
+    let imageData = { question: "", answer: "" };
+    let quiz = null;
+    let showingMistakes = false;
 
-function esc(s="") {
-  return s.replace(/[&<>"']/g, c => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
-  })[c]);
-}
-function toggleLanguage() {
-  lang = lang === "ar" ? "en" : "ar";
-  localStorage.setItem("flash_lang", lang);
-  render();
-}
-function addSection() {
-  const input = document.getElementById("sectionInput");
-  const name = input.value.trim();
-  if (!name) return;
-  const s = { id:id(), name, cards:[], mistakes:[] };
-  db.sections.push(s); db.selected = s.id; input.value = ""; index = 0;
-  save(); render();
-}
-function chooseSection(sid) { db.selected = sid; index = 0; quiz = null; save(); render(); }
-function deleteSection(e, sid) {
-  e.stopPropagation();
-  if (!confirm(t("confirmSection"))) return;
-  db.sections = db.sections.filter(s => s.id !== sid);
-  if (db.selected === sid) db.selected = db.sections[0]?.id || null;
-  quiz = null; index = 0; save(); render();
-}
-function openModal(cardId=null) {
-  editingId = cardId; imageData = {question:"", answer:""};
-  const c = cardId ? section()?.cards.find(x => x.id === cardId) : null;
-  for (const side of ["question","answer"]) {
-    document.getElementById(side+"Text").value = c?.[side] || "";
-    imageData[side] = c?.[side+"Image"] || "";
-    const preview = document.getElementById(side+"Preview");
-    preview.src = imageData[side]; preview.hidden = !imageData[side];
-    document.getElementById(side+"Image").value = "";
-  }
-  document.getElementById("modalTitle").textContent = c ? t("editTitle") : t("addTitle");
-  document.getElementById("modal").classList.add("show");
-}
-function closeModal() { document.getElementById("modal").classList.remove("show"); }
-function loadImage(side) {
-  const file = document.getElementById(side+"Image").files[0];
-  if (!file) return;
-  if (file.size > 2 * 1024 * 1024) {
-    alert(t("imageTooLarge"));
-    document.getElementById(side+"Image").value = "";
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = () => {
-    imageData[side] = reader.result;
-    const preview = document.getElementById(side+"Preview");
-    preview.src = reader.result; preview.hidden = false;
-  };
-  reader.readAsDataURL(file);
-}
-function clearImage(side) {
-  imageData[side] = "";
-  document.getElementById(side+"Image").value = "";
-  document.getElementById(side+"Preview").hidden = true;
-}
-function saveCard() {
-  const s = section();
-  if (!s) return;
-  const q = document.getElementById("questionText").value.trim();
-  const a = document.getElementById("answerText").value.trim();
-  if ((!q && !imageData.question) || (!a && !imageData.answer)) {
-    alert(t("empty")); return;
-  }
-  if (editingId) {
-    const c = s.cards.find(x => x.id === editingId);
-    Object.assign(c, {question:q, answer:a, questionImage:imageData.question, answerImage:imageData.answer});
-  } else {
-    s.cards.push({id:id(), question:q, answer:a, questionImage:imageData.question, answerImage:imageData.answer, known:false});
-    index = s.cards.length - 1;
-  }
-  save(); closeModal(); render();
-}
-function deleteCard(cid) {
-  if (!confirm(t("confirmCard"))) return;
-  const s = section();
-  s.cards = s.cards.filter(c => c.id !== cid);
-  s.mistakes = s.mistakes.filter(c => c.id !== cid);
-  index = Math.max(0, Math.min(index, s.cards.length - 1));
-  save(); render();
-}
-function flip() { document.querySelector(".flashcard")?.classList.toggle("flipped"); }
-function move(n) {
-  const s = section();
-  if (!s?.cards.length) return;
-  index = (index + n + s.cards.length) % s.cards.length;
-  render();
-}
-function markKnown(known) {
-  const s = section(), c = s?.cards[index];
-  if (!c) return;
-  c.known = known; save();
-  if (known) move(1); else render();
-}
-function sideHTML(text, image, label, face) {
-  return `<div class="face ${face}"><span class="face-label">${label}</span>
-    ${text ? `<div>${esc(text).replace(/\n/g,"<br>")}</div>` : ""}
-    ${image ? `<img src="${image}" alt="">` : ""}
-  </div>`;
-}
-function startQuiz() {
-  const s = section();
-  if (!s?.cards.length) return;
-  quiz = { cards:[...s.cards].sort(() => Math.random() - .5), at:0, score:0 };
-  render();
-}
-function quizAnswer(selectedId) {
-  const c = quiz.cards[quiz.at];
-  if (selectedId === c.id) quiz.score++;
-  else if (!section().mistakes.some(x => x.id === c.id)) section().mistakes.push(c);
-  quiz.at++;
-  save();
-  render();
-}
-function endQuiz() { quiz = null; render(); }
-function restoreMistake(cid) {
-  const s = section();
-  s.mistakes = s.mistakes.filter(c => c.id !== cid);
-  save(); render();
-}
-function removeMistake(cid) {
-  const s = section();
-  s.mistakes = s.mistakes.filter(c => c.id !== cid);
-  s.cards = s.cards.filter(c => c.id !== cid);
-  save(); render();
-}
-function render() {
-  document.documentElement.lang = lang;
-  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
-  document.getElementById("appTitle").textContent = t("title");
-  document.getElementById("sectionsTitle").textContent = t("sections");
-  document.getElementById("sectionInput").placeholder = t("sectionPlaceholder");
-  document.getElementById("langBtn").textContent = lang === "ar" ? "English" : "العربية";
-  document.getElementById("questionLabel").textContent = t("question");
-  document.getElementById("answerLabel").textContent = t("answer");
-  document.getElementById("questionText").placeholder = t("question");
-  document.getElementById("answerText").placeholder = t("answerPlaceholder");
-  document.getElementById("cancelBtn").textContent = t("cancel");
-  document.getElementById("saveBtn").textContent = t("save");
-  document.getElementById("removeQuestionImage").textContent = t("removeImage");
-  document.getElementById("removeAnswerImage").textContent = t("removeImage");
+    function loadData() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (saved && Array.isArray(saved.sections)) {
+          saved.sections.forEach(section => {
+            section.cards ||= [];
+            section.mistakes ||= [];
+          });
+          return saved;
+        }
+      } catch (error) {
+        console.error("Could not load saved data", error);
+      }
 
-  const ul = document.getElementById("sectionList");
-  ul.innerHTML = db.sections.length ? db.sections.map(s => `
-    <li class="section ${s.id === db.selected ? "active":""}" onclick="chooseSection('${s.id}')">
-      <span class="section-name">${esc(s.name)}</span>
-      <button class="delete-small" onclick="deleteSection(event,'${s.id}')">×</button>
-    </li>`).join("") : `<li class="muted">${t("addSection")}</li>`;
-
-  const main = document.getElementById("main"), s = section();
-  if (!s) { main.innerHTML = `<div class="empty">${t("addSection")}</div>`; return; }
-
-  s.mistakes ||= [];
-  s.cards ||= [];
-
-  if (quiz) {
-    if (quiz.at >= quiz.cards.length) {
-      main.innerHTML = `<div class="quiz-box"><h2>${t("result")}: ${quiz.score} ${t("of")} ${quiz.cards.length}</h2>
-        <button class="primary" onclick="startQuiz()">${t("retry")}</button>
-        <button class="secondary" onclick="endQuiz()">${t("finish")}</button></div>`;
-      return;
+      return { sections: [], selected: null };
     }
-    const c = quiz.cards[quiz.at];
-    const options = [...quiz.cards].sort(() => Math.random() - .5).slice(0, Math.min(4, quiz.cards.length));
-    if (!options.some(o => o.id === c.id)) options[Math.floor(Math.random()*options.length)] = c;
-    main.innerHTML = `<div class="toolbar"><h2>${t("quizTitle")} — ${esc(s.name)}</h2>
-      <span>${quiz.at+1} / ${quiz.cards.length}</span>
-      <button class="secondary" onclick="endQuiz()">${t("finish")}</button></div>
-      <div class="quiz-question">${c.question ? esc(c.question) : ""}
-        ${c.questionImage ? `<img src="${c.questionImage}">` : ""}</div>
-      <div class="quiz-options">${options.map(o => `<button class="quiz-option" onclick="quizAnswer('${o.id}')">
-        ${o.answer ? esc(o.answer) : ""}${o.answerImage ? `<img style="max-width:100px;max-height:70px;vertical-align:middle" src="${o.answerImage}">` : ""}
-      </button>`).join("")}</div>`;
-    return;
-  }
 
-  const mistakesButton = `<button class="secondary" onclick="showMistakes()">${t("errors")} (${s.mistakes.length})</button>`;
-  if (window.showMistakeList) {
-    main.innerHTML = `<div class="toolbar"><h2>${t("errors")} — ${esc(s.name)}</h2>${mistakesButton}</div>
-      ${s.mistakes.length ? s.mistakes.map(c => `<div style="border-bottom:1px solid #e5e7eb;padding:14px 0">
-        <div><b>${t("question")}:</b> ${esc(c.question || "")}${c.questionImage ? `<img class="preview" src="${c.questionImage}">` : ""}</div>
-        <div style="margin-top:8px"><b>${t("answer")}:</b> ${esc(c.answer || "")}${c.answerImage ? `<img class="preview" src="${c.answerImage}">` : ""}</div>
-        <div class="actions" style="margin-top:10px">
-          <button class="good" onclick="restoreMistake('${c.id}')">${t("addToCards")}</button>
-          <button class="bad" onclick="removeMistake('${c.id}')">${t("removeError")}</button>
-        </div></div>`).join("") : `<div class="empty">${t("noCards")}</div>`}`;
-    return;
-  }
+    const words = {
+      ar: {
+        title: "بطاقاتي التعليمية",
+        sections: "المواد والأقسام",
+        sectionPlaceholder: "اسم القسم",
+        addSection: "أضف قسمًا للبدء",
+        addCard: "إضافة بطاقة",
+        question: "السؤال",
+        answer: "الإجابة",
+        cards: "بطاقات",
+        progress: "التقدم",
+        errors: "الأخطاء",
+        startQuiz: "ابدأ الاختبار",
+        quizTitle: "اختبار",
+        noCards: "لا توجد بطاقات في هذا القسم.",
+        noMistakes: "لا توجد أخطاء محفوظة لهذا القسم.",
+        card: "بطاقة",
+        edit: "تعديل",
+        delete: "حذف",
+        addTitle: "إضافة بطاقة",
+        editTitle: "تعديل البطاقة",
+        cancel: "إلغاء",
+        save: "حفظ",
+        removeImage: "إزالة الصورة",
+        questionPlaceholder: "اكتب السؤال (اختياري إذا أضفت صورة)",
+        answerPlaceholder: "اكتب الإجابة (اختياري إذا أضفت صورة)",
+        empty: "أضف نصًا أو صورة للسؤال وللإجابة.",
+        confirmSection: "حذف القسم وجميع بطاقاته وأخطائه؟",
+        confirmCard: "حذف البطاقة؟",
+        imageTooLarge: "الصورة كبيرة. اختر صورة حجمها أقل من 2 ميغابايت.",
+        quizUnavailable: "أضف بطاقتين أو أكثر لبدء الاختبار.",
+        finish: "إنهاء الاختبار",
+        score: "انتهى الاختبار. نتيجتك",
+        of: "من",
+        retry: "اختبار جديد",
+        restore: "إخراج من الأخطاء وإعادتها للبطاقات",
+        removeMistake: "حذف من الأخطاء",
+        questionNumber: "السؤال"
+      },
+      en: {
+        title: "My Flash Cards",
+        sections: "Subjects & Sections",
+        sectionPlaceholder: "Section name",
+        addSection: "Add a section to start",
+        addCard: "Add card",
+        question: "Question",
+        answer: "Answer",
+        cards: "cards",
+        progress: "Progress",
+        errors: "Mistakes",
+        startQuiz: "Start quiz",
+        quizTitle: "Quiz",
+        noCards: "No cards in this section.",
+        noMistakes: "There are no saved mistakes in this section.",
+        card: "Card",
+        edit: "Edit",
+        delete: "Delete",
+        addTitle: "Add card",
+        editTitle: "Edit card",
+        cancel: "Cancel",
+        save: "Save",
+        removeImage: "Remove image",
+        questionPlaceholder: "Enter question (optional if you add an image)",
+        answerPlaceholder: "Enter answer (optional if you add an image)",
+        empty: "Add text or an image for both the question and answer.",
+        confirmSection: "Delete this section, its cards, and its mistakes?",
+        confirmCard: "Delete this card?",
+        imageTooLarge: "Image is too large. Choose an image under 2 MB.",
+        quizUnavailable: "Add at least two cards to start a quiz.",
+        finish: "Finish quiz",
+        score: "Quiz finished. Your score",
+        of: "of",
+        retry: "New quiz",
+        restore: "Remove from mistakes and restore card",
+        removeMistake: "Delete from mistakes",
+        questionNumber: "Question"
+      }
+    };
 
-  if (!s.cards.length) {
-    main.innerHTML = `<div class="toolbar"><h2>${esc(s.name)}</h2><div class="actions">
-      ${mistakesButton}<button class="primary" onclick="openModal()">+ ${t("addCard")}</button></div></div>
-      <div class="empty">${t("noCards")}</div>`;
-    return;
-  }
+    const t = key => words[lang][key];
+    const makeId = () =>
+      Date.now().toString(36) + Math.random().toString(36).slice(2);
 
-  index = Math.min(index, s.cards.length - 1);
-  const c = s.cards[index], known = s.cards.filter(x => x.known).length;
-  const pct = Math.round(known / s.cards.length * 100);
-  main.innerHTML = `<div class="toolbar"><div><h2>${esc(s.name)}</h2>
-      <span class="muted">${t("card")} ${index+1} / ${s.cards.length} · ${t("progress")} ${pct}%</span></div>
-      <div class="actions">${mistakesButton}<button class="primary" onclick="openModal()">+ ${t("addCard")}</button>
-      <button class="good" onclick="startQuiz()">${t("startQuiz")}</button></div></div>
-    <div class="progress"><div style="width:${pct}%"></div></div>
-    <div class="card-wrap"><div class="flashcard" onclick="flip()">
-      ${sideHTML(c.question,c.questionImage,t("question"),"front")}
-      ${sideHTML(c.answer,c.answerImage,t("answer"),"back")}
-    </div></div><p class="muted">${t("flip")}</p>
-    <div class="actions" style="justify-content:center">
-      <button class="secondary" onclick="move(-1)">${t("previous")}</button>
-      <button class="good" onclick="markKnown(true)">${t("knew")}</button>
-      <button class="bad" onclick="markKnown(false)">${t("forgot")}</button>
-      <button class="secondary" onclick="move(1)">${t("next")}</button>
-      <button class="secondary" onclick="openModal('${c.id}')">${t("edit")}</button>
-      <button class="bad" onclick="deleteCard('${c.id}')">${t("delete")}</button>
-    </div>`;
-}
-window.showMistakeList = false;
-function showMistakes() { window.showMistakeList = !window.showMistakeList; render(); }
-document.getElementById("sectionInput").addEventListener("keydown", e => { if(e.key==="Enter") addSection(); });
-document.getElementById("modal").addEventListener("click", e => { if(e.target.id==="modal") closeModal(); });
-render();
-</script>
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+      } catch (error) {
+        alert(lang === "ar"
+          ? "تعذر الحفظ. قد تكون مساحة تخزين المتصفح ممتلئة؛ جرّب صورًا أصغر."
+          : "Could not save. Browser storage may be full; try smaller images.");
+      }
+    }
+
+    function currentSection() {
+      return db.sections.find(section => section.id === db.selected);
+    }
+
+    function escapeHTML(value = "") {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function toggleLanguage() {
+      lang = lang === "ar" ? "en" : "ar";
+      localStorage.setItem("flash_cards_language", lang);
+      render();
+    }
+
+    function addSection() {
+      const input = document.getElementById("sectionInput");
+      const name = input.value.trim();
+      if (!name) return;
+
+      const newSection = {
+        id: makeId(),
+        name,
+        cards: [],
+        mistakes: []
+      };
+
+      db.sections.push(newSection);
+      db.selected = newSection.id;
+      input.value = "";
+      quiz = null;
+      showingMistakes = false;
+      saveData();
+      render();
+    }
+
+    function selectSection(sectionId) {
+      db.selected = sectionId;
+      quiz = null;
+      showingMistakes = false;
+      saveData();
+      render();
+    }
+
+    function deleteSection(event, sectionId) {
+      event.stopPropagation();
+      if (!confirm(t("confirmSection"))) return;
+
+      db.sections = db.sections.filter(section => section.id !== sectionId);
+
+      if (db.selected === sectionId) {
+        db.selected = db.sections[0]?.id || null;
+      }
+
+      quiz = null;
+      showingMistakes = false;
+      saveData();
+      render();
+    }
+
+    function openModal(cardId = null) {
+      editingId = cardId;
+      imageData = { question: "", answer: "" };
+
+      const card = cardId
+        ? currentSection()?.cards.find(item => item.id === cardId)
+        : null;
+
+      for (const side of ["question", "answer"]) {
+        document.getElementById(side + "Text").value = card?.[side] || "";
+        imageData[side] = card?.[side + "Image"] || "";
+
+        const preview = document.getElementById(side + "Preview");
+        preview.src = imageData[side];
+        preview.hidden = !imageData[side];
+
+        // تصفير حقل الملف عند فتح نافذة البطاقة
+        document.getElementById(side + "Image").value = "";
+      }
+
+      document.getElementById("modalTitle").textContent =
+        card ? t("editTitle") : t("addTitle");
+
+      document.getElementById("modal").classList.add("show");
+    }
+
+    function closeModal() {
+      document.getElementById("modal").classList.remove("show");
+      editingId = null;
+    }
+
+    function loadImage(side) {
+      const input = document.getElementById(side + "Image");
+      const file = input.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        input.value = "";
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        alert(t("imageTooLarge"));
+        input.value = "";
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        imageData[side] = reader.result;
+
+        const preview = document.getElementById(side + "Preview");
+        preview.src = reader.result;
+        preview.hidden = false;
+
+        // يتيح اختيار الملف نفسه مرة أخرى
+        input.value = "";
+      };
+
+      reader.onerror = () => {
+        input.value = "";
+        alert(lang === "ar" ? "تعذر قراءة الصورة." : "Could not read the image.");
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function clearImage(side) {
+      imageData[side] = "";
+      document.getElementById(side + "Image").value = "";
+      const preview = document.getElementById(side + "Preview");
+      preview.src = "";
+      preview.hidden = true;
+    }
+
+    function saveCard() {
+      const section = currentSection();
+      if (!section) return;
+
+      const question = document.getElementById("questionText").value.trim();
+      const answer = document.getElementById("answerText").value.trim();
+
+      if ((!question && !imageData.question) || (!answer && !imageData.answer)) {
+        alert(t("empty"));
+        return;
+      }
+
+      if (editingId) {
+        const card = section.cards.find(item => item.id === editingId);
+        if (!card) return;
+
+        Object.assign(card, {
+          question,
+          answer,
+          questionImage: imageData.question,
+          answerImage: imageData.answer
+        });
+      } else {
+        section.cards.push({
+          id: makeId(),
+          question,
+          answer,
+          questionImage: imageData.question,
+          answerImage: imageData.answer,
+          known: false
+        });
+      }
+
+      saveData();
+      closeModal();
+      render();
+    }
+
+    function deleteCard(cardId) {
+      if (!confirm(t("confirmCard"))) return;
+
+      const section = currentSection();
+      if (!section) return;
+
+      section.cards = section.cards.filter(card => card.id !== cardId);
+      section.mistakes = section.mistakes.filter(card => card.id !== cardId);
+
+      saveData();
+      render();
+    }
+
+    function renderCardList(cards) {
+      return `
+        <div class="cards-list">
+          ${cards.map((card, index) => `
+            <article class="stacked-card">
+              <div class="card-number">${t("card")} ${index + 1}</div>
+
+              <h3>${t("question")}</h3>
+              ${card.question
+                ? `<p>${escapeHTML(card.question)}</p>`
+                : ""}
+              ${card.questionImage
+                ? `<img src="${card.questionImage}" alt="">`
+                : ""}
+
+              <h3>${t("answer")}</h3>
+              ${card.answer
+                ? `<p>${escapeHTML(card.answer)}</p>`
+                : ""}
+              ${card.answerImage
+                ? `<img src="${card.answerImage}" alt="">`
+                : ""}
+
+              <div class="actions">
+                <button class="secondary" onclick="openModal('${card.id}')">
+                  ${t("edit")}
+                </button>
+                <button class="bad" onclick="deleteCard('${card.id}')">
+                  ${t("delete")}
+                </button>
+              </div>
+            </article>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function startQuiz() {
+      const section = currentSection();
+      if (!section || section.cards.length < 2) {
+        alert(t("quizUnavailable"));
+        return;
+      }
+
+      const shuffled = [...section.cards];
+
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      quiz = {
+        cards: shuffled,
+        position: 0,
+        score: 0
+      };
+
+      showingMistakes = false;
+      render();
+    }
+
+    function recordMistake(card) {
+      const section = currentSection();
+      if (!section) return;
+
+      section.mistakes ||= [];
+
+      if (!section.mistakes.some(item => item.id === card.id)) {
+        section.mistakes.push({ ...card });
+      }
+    }
+
+    function answerQuiz(selectedCardId) {
+      const questionCard = quiz.cards[quiz.position];
+
+      if (selectedCardId === questionCard.id) {
+        quiz.score++;
+      } else {
+        recordMistake(questionCard);
+      }
+
+      quiz.position++;
+      saveData();
+      render();
+    }
+
+    function finishQuiz() {
+      quiz = null;
+      render();
+    }
+
+    function quizOptionHTML(card) {
+      return `
+        ${card.answer ? `<span>${escapeHTML(card.answer)}</span>` : ""}
+        ${card.answerImage ? `<img src="${card.answerImage}" alt="">` : ""}
+      `;
+    }
+
+    function renderQuiz(section) {
+      if (quiz.position >= quiz.cards.length) {
+        return `
+          <div class="quiz-box">
+            <h2>${t("score")}: ${quiz.score} ${t("of")} ${quiz.cards.length}</h2>
+            <button class="primary" onclick="startQuiz()">${t("retry")}</button>
+            <button class="secondary" onclick="finishQuiz()">${t("finish")}</button>
+          </div>
+        `;
+      }
+
+      const questionCard = quiz.cards[quiz.position];
+
+      // الإجابة الصحيحة مع ثلاثة خيارات أخرى كحد أقصى
+      const wrongOptions = quiz.cards.filter(card => card.id !== questionCard.id);
+      for (let i = wrongOptions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [wrongOptions[i], wrongOptions[j]] = [wrongOptions[j], wrongOptions[i]];
+      }
+
+      const options = [
+        questionCard,
+        ...wrongOptions.slice(0, 3)
+      ];
+
+      for (let i = options.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [options[i], options[j]] = [options[j], options[i]];
+      }
+
+      return `
+        <div class="toolbar">
+          <h2>${t("quizTitle")} — ${escapeHTML(section.name)}</h2>
+          <span>${quiz.position + 1} / ${quiz.cards.length}</span>
+          <button class="secondary" onclick="finishQuiz()">${t("finish")}</button>
+        </div>
+
+        <div class="quiz-question">
+          ${questionCard.question ? `<div>${escapeHTML(questionCard.question)}</div>` : ""}
+          ${questionCard.questionImage
+            ? `<img src="${questionCard.questionImage}" alt="">`
+            : ""}
+        </div>
+
+        <div class="quiz-options">
+          ${options.map(option => `
+            <button class="quiz-option" onclick="answerQuiz('${option.id}')">
+              ${quizOptionHTML(option)}
+            </button>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function restoreMistake(cardId) {
+      const section = currentSection();
+      if (!section) return;
+
+      section.mistakes = section.mistakes.filter(card => card.id !== cardId);
+      saveData();
+      render();
+    }
+
+    function deleteMistake(cardId) {
+      const section = currentSection();
+      if (!section) return;
+
+      section.mistakes = section.mistakes.filter(card => card.id !== cardId);
+      saveData();
+      render();
+    }
+
+    function renderMistakes(section) {
+      if (!section.mistakes.length) {
+        return `<div class="empty">${t("noMistakes")}</div>`;
+      }
+
+      return section.mistakes.map(card => `
+        <article class="mistake-item">
+          <h3>${t("question")}</h3>
+          ${card.question ? `<p>${escapeHTML(card.question)}</p>` : ""}
+          ${card.questionImage ? `<img src="${card.questionImage}" alt="">` : ""}
+
+          <h3>${t("answer")}</h3>
+          ${card.answer ? `<p>${escapeHTML(card.answer)}</p>` : ""}
+          ${card.answerImage ? `<img src="${card.answerImage}" alt="">` : ""}
+
+          <div class="actions">
+            <button class="good" onclick="restoreMistake('${card.id}')">
+              ${t("restore")}
+            </button>
+            <button class="bad" onclick="deleteMistake('${card.id}')">
+              ${t("removeMistake")}
+            </button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function render() {
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+
+      document.getElementById("appTitle").textContent = t("title");
+      document.getElementById("sectionsTitle").textContent = t("sections");
+      document.getElementById("sectionInput").placeholder = t("sectionPlaceholder");
+      document.getElementById("langBtn").textContent =
+        lang === "ar" ? "English" : "العربية";
+
+      document.getElementById("questionLabel").textContent = t("question");
+      document.getElementById("answerLabel").textContent = t("answer");
+      document.getElementById("questionText").placeholder = t("questionPlaceholder");
+      document.getElementById("answerText").placeholder = t("answerPlaceholder");
+      document.getElementById("cancelBtn").textContent = t("cancel");
+      document.getElementById("saveBtn").textContent = t("save");
+      document.getElementById("removeQuestionImage").textContent = t("removeImage");
+      document.getElementById("removeAnswerImage").textContent = t("removeImage");
+
+      const sectionList = document.getElementById("sectionList");
+
+      sectionList.innerHTML = db.sections.length
+        ? db.sections.map(section => `
+            <li class="section ${section.id === db.selected ? "active" : ""}"
+                onclick="selectSection('${section.id}')">
+              <span class="section-name">${escapeHTML(section.name)}</span>
+              <button class="delete-small"
+                onclick="deleteSection(event,'${section.id}')">×</button>
+            </li>
+          `).join("")
+        : `<li class="muted">${t("addSection")}</li>`;
+
+      const main = document.getElementById("main");
+      const section = currentSection();
+
+      if (!section) {
+        main.innerHTML = `<div class="empty">${t("addSection")}</div>`;
+        return;
+      }
+
+      section.cards ||= [];
+      section.mistakes ||= [];
+
+      const mistakesButton = `
+        <button class="secondary" onclick="toggleMistakes()">
+          ${t("errors")} (${section.mistakes.length})
+        </button>
+      `;
+
+      if (quiz) {
+        main.innerHTML = renderQuiz(section);
+        return;
+      }
+
+      if (showingMistakes) {
+        main.innerHTML = `
+          <div class="toolbar">
+            <h2>${t("errors")} — ${escapeHTML(section.name)}</h2>
+            ${mistakesButton}
+          </div>
+          ${renderMistakes(section)}
+        `;
+        return;
+      }
+
+      const known = section.cards.filter(card => card.known).length;
+      const progress = section.cards.length
+        ? Math.round(known / section.cards.length * 100)
+        : 0;
+
+      main.innerHTML = `
+        <div class="toolbar">
+          <div>
+            <h2>${escapeHTML(section.name)}</h2>
+            <span class="muted">
+              ${section.cards.length} ${t("cards")} · ${t("progress")} ${progress}%
+            </span>
+          </div>
+
+          <div class="actions">
+            ${mistakesButton}
+            <button class="primary" onclick="openModal()">+ ${t("addCard")}</button>
+            <button class="good" onclick="startQuiz()">${t("startQuiz")}</button>
+          </div>
+        </div>
+
+        <div class="progress"><div style="width:${progress}%"></div></div>
+
+        ${section.cards.length
+          ? renderCardList(section.cards)
+          : `<div class="empty">${t("noCards")}</div>`
+        }
+      `;
+    }
+
+    function toggleMistakes() {
+      showingMistakes = !showingMistakes;
+      render();
+    }
+
+    document.getElementById("questionImage")
+      .addEventListener("change", () => loadImage("question"));
+
+    document.getElementById("answerImage")
+      .addEventListener("change", () => loadImage("answer"));
+
+    document.getElementById("sectionInput")
+      .addEventListener("keydown", event => {
+        if (event.key === "Enter") addSection();
+      });
+
+    document.getElementById("modal")
+      .addEventListener("click", event => {
+        if (event.target.id === "modal") closeModal();
+      });
+
+    render();
+  </script>
 </body>
 </html>
