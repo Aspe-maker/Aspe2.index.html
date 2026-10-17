@@ -1,855 +1,387 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Flash Cards</title>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>بطاقاتي التعليمية</title>
   <style>
-    :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --bg: #f3f4f6;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --danger: #ef4444;
-      --success: #10b981;
-      --border: #e5e7eb;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { margin: 0; background: #f3f4f6; color: #111827; }
     header {
-      background: var(--primary);
-      color: white;
-      padding: 18px 5%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
+      padding: 18px 5%; background: #6366f1; color: white;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; flex-wrap: wrap;
     }
-
-    header h1 {
-      font-size: 24px;
+    button { border: 0; border-radius: 8px; padding: 10px 14px; cursor: pointer; }
+    button:hover { opacity: .88; }
+    input, textarea { width: 100%; padding: 11px; border: 1px solid #d1d5db; border-radius: 8px; }
+    .layout { max-width: 1200px; margin: 24px auto; padding: 0 16px; display: grid; grid-template-columns: 270px 1fr; gap: 20px; }
+    .panel { background: white; padding: 20px; border-radius: 14px; box-shadow: 0 4px 15px #0000000d; }
+    .add-section { display: flex; gap: 8px; margin: 14px 0; }
+    .primary { background: #6366f1; color: white; }
+    .secondary { background: #e5e7eb; color: #111827; }
+    .good { background: #10b981; color: white; }
+    .bad { background: #ef4444; color: white; }
+    .sections { list-style: none; padding: 0; display: grid; gap: 8px; }
+    .section {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px; background: #f9fafb; border: 1px solid transparent;
+      border-radius: 8px; cursor: pointer; gap: 6px;
     }
-
-    button,
-    input,
-    textarea {
-      font: inherit;
+    .section.active { border-color: #6366f1; background: #eef2ff; }
+    .section-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+    .delete-small { background: transparent; color: #ef4444; padding: 4px 8px; }
+    .toolbar, .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .toolbar { justify-content: space-between; }
+    .card-wrap { display: grid; place-items: center; margin: 22px 0; perspective: 1000px; }
+    .flashcard { width: min(100%, 620px); min-height: 300px; position: relative; cursor: pointer; transform-style: preserve-3d; transition: transform .55s; }
+    .flashcard.flipped { transform: rotateY(180deg); }
+    .face {
+      position: absolute; inset: 0; min-height: 300px; padding: 35px;
+      border-radius: 18px; color: white; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; text-align: center;
+      backface-visibility: hidden; box-shadow: 0 8px 22px #0002;
+      font-size: 22px; line-height: 1.5; overflow-wrap: anywhere;
     }
-
-    button {
-      border: none;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 10px 15px;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-      opacity: 0.9;
-    }
-
-    .language-btn {
-      background: white;
-      color: var(--primary);
-      font-weight: bold;
-    }
-
-    .layout {
-      max-width: 1250px;
-      margin: 25px auto;
-      padding: 0 20px;
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 22px;
-    }
-
-    .sidebar,
-    .content-box {
-      background: var(--card);
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
-    }
-
-    .sidebar h2 {
-      margin-bottom: 15px;
-      font-size: 20px;
-    }
-
-    .add-section {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-
-    input,
-    textarea {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 11px;
-      outline: none;
-      background: white;
-      color: var(--text);
-    }
-
-    input:focus,
-    textarea:focus {
-      border-color: var(--primary);
-    }
-
-    .add-section input {
-      min-width: 0;
-    }
-
-    .primary-btn {
-      background: var(--primary);
-      color: white;
-    }
-
-    .section-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .section-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 5px;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #f9fafb;
-      border: 1px solid transparent;
-    }
-
-    .section-item:hover,
-    .section-item.active {
-      background: #eef2ff;
-      border-color: var(--primary);
-      color: var(--primary-dark);
-    }
-
-    .section-name {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .delete-btn {
-      background: transparent;
-      color: var(--danger);
-      padding: 4px 7px;
-      font-size: 16px;
-    }
-
-    .top-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-
-    .top-content h2 {
-      font-size: 25px;
-    }
-
-    .stats {
-      display: flex;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .progress-container {
-      margin: 18px 0;
-    }
-
-    .progress-bar {
-      height: 10px;
-      background: #e5e7eb;
-      border-radius: 20px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 0;
-      background: var(--success);
-      transition: width 0.3s;
-    }
-
-    .flashcard-area {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 350px;
-      margin: 20px 0;
-      perspective: 1000px;
-    }
-
-    .flashcard {
-      width: min(100%, 600px);
-      height: 310px;
-      position: relative;
-      cursor: pointer;
-      transform-style: preserve-3d;
-      transition: transform 0.6s;
-    }
-
-    .flashcard.flipped {
-      transform: rotateY(180deg);
-    }
-
-    .card-face {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      border-radius: 18px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 35px;
-      font-size: 25px;
-      line-height: 1.6;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-      word-break: break-word;
-    }
-
-    .front {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: white;
-    }
-
-    .back {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: white;
-      transform: rotateY(180deg);
-    }
-
-    .card-label {
-      position: absolute;
-      top: 15px;
-      font-size: 13px;
-      opacity: 0.8;
-    }
-
-    [dir="rtl"] .card-label {
-      right: 20px;
-    }
-
-    [dir="ltr"] .card-label {
-      left: 20px;
-    }
-
-    .card-actions {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .secondary-btn {
-      background: #e5e7eb;
-      color: #111827;
-    }
-
-    .success-btn {
-      background: var(--success);
-      color: white;
-    }
-
-    .danger-btn {
-      background: var(--danger);
-      color: white;
-    }
-
-    .empty-state {
-      text-align: center;
-      color: var(--muted);
-      padding: 70px 20px;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      z-index: 10;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-box {
-      background: white;
-      width: min(100%, 550px);
-      padding: 25px;
-      border-radius: 15px;
-    }
-
-    .modal-box h2 {
-      margin-bottom: 18px;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 7px;
-      font-weight: bold;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    @media (max-width: 800px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        order: 1;
-      }
-
-      .content-box {
-        order: 2;
-      }
-
-      .flashcard {
-        height: 280px;
-      }
-
-      .card-face {
-        font-size: 21px;
-      }
-    }
+    .front { background: linear-gradient(135deg,#6366f1,#8b5cf6); }
+    .back { background: linear-gradient(135deg,#10b981,#059669); transform: rotateY(180deg); }
+    .face img { max-width: 100%; max-height: 180px; object-fit: contain; border-radius: 8px; margin-top: 10px; }
+    .face-label { position: absolute; top: 12px; inset-inline-start: 16px; opacity: .8; font-size: 14px; }
+    .muted { color: #6b7280; text-align: center; }
+    .progress { height: 9px; background: #e5e7eb; border-radius: 20px; overflow: hidden; margin: 15px 0; }
+    .progress div { height: 100%; background: #10b981; }
+    .modal { display: none; position: fixed; inset: 0; background: #0008; z-index: 5; padding: 18px; align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-box { width: min(100%, 560px); max-height: 90vh; overflow: auto; background: white; padding: 22px; border-radius: 14px; }
+    .field { margin: 14px 0; }
+    .field label { display: block; margin-bottom: 7px; font-weight: bold; }
+    .preview { max-width: 150px; max-height: 100px; display: block; object-fit: contain; margin-top: 8px; }
+    .empty { text-align: center; padding: 65px 10px; color: #6b7280; }
+    .quiz-box { text-align: center; padding: 25px 10px; }
+    .quiz-question { font-size: 23px; margin: 20px 0; }
+    .quiz-question img { display: block; max-width: min(100%, 350px); max-height: 220px; margin: 12px auto; }
+    .quiz-options { display: grid; gap: 10px; max-width: 650px; margin: 20px auto; }
+    .quiz-option { background: #eef2ff; text-align: start; padding: 14px; }
+    @media(max-width: 760px) { .layout { grid-template-columns: 1fr; } .flashcard, .face { min-height: 260px; } }
   </style>
 </head>
-
 <body>
-  <header>
-    <h1 id="appTitle">بطاقاتي التعليمية</h1>
-    <button class="language-btn" onclick="toggleLanguage()" id="languageBtn">
-      English
-    </button>
-  </header>
+<header>
+  <h1 id="appTitle"></h1>
+  <button class="secondary" onclick="toggleLanguage()" id="langBtn"></button>
+</header>
 
-  <main class="layout">
-    <aside class="sidebar">
-      <h2 id="sectionsTitle">الأقسام</h2>
+<main class="layout">
+  <aside class="panel">
+    <h2 id="sectionsTitle"></h2>
+    <div class="add-section">
+      <input id="sectionInput">
+      <button class="primary" onclick="addSection()">+</button>
+    </div>
+    <ul class="sections" id="sectionList"></ul>
+  </aside>
+  <section class="panel" id="main"></section>
+</main>
 
-      <div class="add-section">
-        <input id="sectionInput" placeholder="اسم القسم" />
-        <button class="primary-btn" onclick="addSection()">+</button>
-      </div>
-
-      <ul class="section-list" id="sectionList"></ul>
-    </aside>
-
-    <section class="content-box">
-      <div id="mainContent"></div>
-    </section>
-  </main>
-
-  <div class="modal" id="cardModal">
-    <div class="modal-box">
-      <h2 id="modalTitle">إضافة بطاقة جديدة</h2>
-
-      <div class="form-group">
-        <label id="questionLabel" for="questionInput">السؤال</label>
-        <textarea id="questionInput" rows="4"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label id="answerLabel" for="answerInput">الإجابة</label>
-        <textarea id="answerInput" rows="4"></textarea>
-      </div>
-
-      <div class="modal-actions">
-        <button class="secondary-btn" onclick="closeModal()" id="cancelBtn">
-          إلغاء
-        </button>
-
-        <button class="primary-btn" onclick="saveCard()" id="saveBtn">
-          حفظ
-        </button>
-      </div>
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h2 id="modalTitle"></h2>
+    <div class="field">
+      <label id="questionLabel"></label>
+      <textarea id="questionText" rows="3"></textarea>
+      <input id="questionImage" type="file" accept="image/*" onchange="loadImage('question')">
+      <img id="questionPreview" class="preview" hidden>
+      <button class="delete-small" onclick="clearImage('question')" id="removeQuestionImage"></button>
+    </div>
+    <div class="field">
+      <label id="answerLabel"></label>
+      <textarea id="answerText" rows="3"></textarea>
+      <input id="answerImage" type="file" accept="image/*" onchange="loadImage('answer')">
+      <img id="answerPreview" class="preview" hidden>
+      <button class="delete-small" onclick="clearImage('answer')" id="removeAnswerImage"></button>
+    </div>
+    <div class="actions" style="justify-content:flex-end">
+      <button class="secondary" onclick="closeModal()" id="cancelBtn"></button>
+      <button class="primary" onclick="saveCard()" id="saveBtn"></button>
     </div>
   </div>
+</div>
 
-  <script>
-    const STORAGE_KEY = "flash_cards_app_data";
+<script>
+const KEY = "flash_cards_v2";
+let lang = localStorage.getItem("flash_lang") || "ar";
+let db = JSON.parse(localStorage.getItem(KEY)) || { sections: [], selected: null };
+let index = 0, editingId = null, imageData = { question: "", answer: "" };
+let quiz = null;
 
-    let language = localStorage.getItem("flash_language") || "ar";
-    let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-      sections: [],
-      selectedSectionId: null
-    };
+const words = {
+  ar: {
+    title:"بطاقاتي التعليمية", sections:"المواد والأقسام", sectionPlaceholder:"اسم القسم",
+    addSection:"أضف قسمًا للبدء", addCard:"إضافة بطاقة", question:"السؤال",
+    answer:"الإجابة", card:"بطاقة", progress:"التقدم", previous:"السابق",
+    next:"التالي", knew:"عرفتها", forgot:"لم أتذكرها", edit:"تعديل",
+    delete:"حذف", flip:"اضغط على البطاقة لقلبها", noCards:"لا توجد بطاقات هنا.",
+    errors:"الأخطاء", startQuiz:"ابدأ الاختبار", quizTitle:"اختبار",
+    noQuiz:"لا توجد بطاقات للاختبار في هذا القسم.", finish:"إنهاء الاختبار",
+    correct:"إجابة صحيحة!", wrong:"إجابة خاطئة — أضيفت إلى الأخطاء.",
+    result:"انتهى الاختبار. النتيجة", of:"من", retry:"اختبار جديد",
+    addToCards:"إخراج من الأخطاء وإعادتها للبطاقات", removeError:"حذف من الأخطاء",
+    addTitle:"إضافة بطاقة", editTitle:"تعديل البطاقة", cancel:"إلغاء",
+    save:"حفظ", removeImage:"إزالة الصورة", empty:"أضف نصًا أو صورة للسؤال وللإجابة.",
+    confirmSection:"حذف القسم وجميع بطاقاته؟", confirmCard:"حذف البطاقة؟",
+    errorCount:"سؤال في الأخطاء", imageTooLarge:"الصورة كبيرة. اختر صورة أصغر من 2 ميغابايت.",
+    answerPlaceholder:"اكتب الإجابة (اختياري إذا أضفت صورة)"
+  },
+  en: {
+    title:"My Flash Cards", sections:"Subjects & Sections", sectionPlaceholder:"Section name",
+    addSection:"Add a section to start", addCard:"Add card", question:"Question",
+    answer:"Answer", card:"Card", progress:"Progress", previous:"Previous",
+    next:"Next", knew:"I knew it", forgot:"I forgot", edit:"Edit",
+    delete:"Delete", flip:"Click the card to flip", noCards:"No cards here.",
+    errors:"Mistakes", startQuiz:"Start quiz", quizTitle:"Quiz",
+    noQuiz:"No cards available for a quiz.", finish:"Finish quiz",
+    correct:"Correct!", wrong:"Wrong answer — added to mistakes.",
+    result:"Quiz finished. Score", of:"of", retry:"New quiz",
+    addToCards:"Remove from mistakes and restore card", removeError:"Delete from mistakes",
+    addTitle:"Add card", editTitle:"Edit card", cancel:"Cancel",
+    save:"Save", removeImage:"Remove image", empty:"Add text or an image for both question and answer.",
+    confirmSection:"Delete this section and all its cards?", confirmCard:"Delete this card?",
+    errorCount:"questions in mistakes", imageTooLarge:"Image is too large. Choose an image under 2 MB.",
+    answerPlaceholder:"Enter answer (optional if you add an image)"
+  }
+};
+const t = key => words[lang][key];
+const id = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+const save = () => localStorage.setItem(KEY, JSON.stringify(db));
+const section = () => db.sections.find(s => s.id === db.selected);
 
-    let currentCardIndex = 0;
-    let editingCardId = null;
+function esc(s="") {
+  return s.replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[c]);
+}
+function toggleLanguage() {
+  lang = lang === "ar" ? "en" : "ar";
+  localStorage.setItem("flash_lang", lang);
+  render();
+}
+function addSection() {
+  const input = document.getElementById("sectionInput");
+  const name = input.value.trim();
+  if (!name) return;
+  const s = { id:id(), name, cards:[], mistakes:[] };
+  db.sections.push(s); db.selected = s.id; input.value = ""; index = 0;
+  save(); render();
+}
+function chooseSection(sid) { db.selected = sid; index = 0; quiz = null; save(); render(); }
+function deleteSection(e, sid) {
+  e.stopPropagation();
+  if (!confirm(t("confirmSection"))) return;
+  db.sections = db.sections.filter(s => s.id !== sid);
+  if (db.selected === sid) db.selected = db.sections[0]?.id || null;
+  quiz = null; index = 0; save(); render();
+}
+function openModal(cardId=null) {
+  editingId = cardId; imageData = {question:"", answer:""};
+  const c = cardId ? section()?.cards.find(x => x.id === cardId) : null;
+  for (const side of ["question","answer"]) {
+    document.getElementById(side+"Text").value = c?.[side] || "";
+    imageData[side] = c?.[side+"Image"] || "";
+    const preview = document.getElementById(side+"Preview");
+    preview.src = imageData[side]; preview.hidden = !imageData[side];
+    document.getElementById(side+"Image").value = "";
+  }
+  document.getElementById("modalTitle").textContent = c ? t("editTitle") : t("addTitle");
+  document.getElementById("modal").classList.add("show");
+}
+function closeModal() { document.getElementById("modal").classList.remove("show"); }
+function loadImage(side) {
+  const file = document.getElementById(side+"Image").files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    alert(t("imageTooLarge"));
+    document.getElementById(side+"Image").value = "";
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    imageData[side] = reader.result;
+    const preview = document.getElementById(side+"Preview");
+    preview.src = reader.result; preview.hidden = false;
+  };
+  reader.readAsDataURL(file);
+}
+function clearImage(side) {
+  imageData[side] = "";
+  document.getElementById(side+"Image").value = "";
+  document.getElementById(side+"Preview").hidden = true;
+}
+function saveCard() {
+  const s = section();
+  if (!s) return;
+  const q = document.getElementById("questionText").value.trim();
+  const a = document.getElementById("answerText").value.trim();
+  if ((!q && !imageData.question) || (!a && !imageData.answer)) {
+    alert(t("empty")); return;
+  }
+  if (editingId) {
+    const c = s.cards.find(x => x.id === editingId);
+    Object.assign(c, {question:q, answer:a, questionImage:imageData.question, answerImage:imageData.answer});
+  } else {
+    s.cards.push({id:id(), question:q, answer:a, questionImage:imageData.question, answerImage:imageData.answer, known:false});
+    index = s.cards.length - 1;
+  }
+  save(); closeModal(); render();
+}
+function deleteCard(cid) {
+  if (!confirm(t("confirmCard"))) return;
+  const s = section();
+  s.cards = s.cards.filter(c => c.id !== cid);
+  s.mistakes = s.mistakes.filter(c => c.id !== cid);
+  index = Math.max(0, Math.min(index, s.cards.length - 1));
+  save(); render();
+}
+function flip() { document.querySelector(".flashcard")?.classList.toggle("flipped"); }
+function move(n) {
+  const s = section();
+  if (!s?.cards.length) return;
+  index = (index + n + s.cards.length) % s.cards.length;
+  render();
+}
+function markKnown(known) {
+  const s = section(), c = s?.cards[index];
+  if (!c) return;
+  c.known = known; save();
+  if (known) move(1); else render();
+}
+function sideHTML(text, image, label, face) {
+  return `<div class="face ${face}"><span class="face-label">${label}</span>
+    ${text ? `<div>${esc(text).replace(/\n/g,"<br>")}</div>` : ""}
+    ${image ? `<img src="${image}" alt="">` : ""}
+  </div>`;
+}
+function startQuiz() {
+  const s = section();
+  if (!s?.cards.length) return;
+  quiz = { cards:[...s.cards].sort(() => Math.random() - .5), at:0, score:0 };
+  render();
+}
+function quizAnswer(selectedId) {
+  const c = quiz.cards[quiz.at];
+  if (selectedId === c.id) quiz.score++;
+  else if (!section().mistakes.some(x => x.id === c.id)) section().mistakes.push(c);
+  quiz.at++;
+  save();
+  render();
+}
+function endQuiz() { quiz = null; render(); }
+function restoreMistake(cid) {
+  const s = section();
+  s.mistakes = s.mistakes.filter(c => c.id !== cid);
+  save(); render();
+}
+function removeMistake(cid) {
+  const s = section();
+  s.mistakes = s.mistakes.filter(c => c.id !== cid);
+  s.cards = s.cards.filter(c => c.id !== cid);
+  save(); render();
+}
+function render() {
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  document.getElementById("appTitle").textContent = t("title");
+  document.getElementById("sectionsTitle").textContent = t("sections");
+  document.getElementById("sectionInput").placeholder = t("sectionPlaceholder");
+  document.getElementById("langBtn").textContent = lang === "ar" ? "English" : "العربية";
+  document.getElementById("questionLabel").textContent = t("question");
+  document.getElementById("answerLabel").textContent = t("answer");
+  document.getElementById("questionText").placeholder = t("question");
+  document.getElementById("answerText").placeholder = t("answerPlaceholder");
+  document.getElementById("cancelBtn").textContent = t("cancel");
+  document.getElementById("saveBtn").textContent = t("save");
+  document.getElementById("removeQuestionImage").textContent = t("removeImage");
+  document.getElementById("removeAnswerImage").textContent = t("removeImage");
 
-    const translations = {
-      ar: {
-        title: "بطاقاتي التعليمية",
-        sections: "الأقسام",
-        sectionPlaceholder: "اسم القسم",
-        addFirstSection: "أضف قسمًا للبدء",
-        noCards: "لا توجد بطاقات في هذا القسم",
-        addCard: "إضافة بطاقة",
-        question: "السؤال",
-        answer: "الإجابة",
-        previous: "السابق",
-        next: "التالي",
-        remembered: "عرفتها",
-        forgot: "لم أتذكرها",
-        deleteCard: "حذف البطاقة",
-        addCardTitle: "إضافة بطاقة جديدة",
-        editCardTitle: "تعديل البطاقة",
-        cancel: "إلغاء",
-        save: "حفظ",
-        card: "بطاقة",
-        cards: "بطاقات",
-        progress: "التقدم",
-        clickToFlip: "اضغط على البطاقة لقلبها",
-        confirmDeleteSection: "هل تريد حذف هذا القسم وجميع بطاقاته؟",
-        confirmDeleteCard: "هل تريد حذف هذه البطاقة؟",
-        emptyQuestion: "اكتب السؤال والإجابة أولًا"
-      },
-      en: {
-        title: "My Flash Cards",
-        sections: "Sections",
-        sectionPlaceholder: "Section name",
-        addFirstSection: "Add a section to start",
-        noCards: "No cards in this section",
-        addCard: "Add Card",
-        question: "Question",
-        answer: "Answer",
-        previous: "Previous",
-        next: "Next",
-        remembered: "I knew it",
-        forgot: "I forgot",
-        deleteCard: "Delete Card",
-        addCardTitle: "Add New Card",
-        editCardTitle: "Edit Card",
-        cancel: "Cancel",
-        save: "Save",
-        card: "Card",
-        cards: "Cards",
-        progress: "Progress",
-        clickToFlip: "Click the card to flip",
-        confirmDeleteSection: "Delete this section and all its cards?",
-        confirmDeleteCard: "Delete this card?",
-        emptyQuestion: "Enter the question and answer first"
-      }
-    };
+  const ul = document.getElementById("sectionList");
+  ul.innerHTML = db.sections.length ? db.sections.map(s => `
+    <li class="section ${s.id === db.selected ? "active":""}" onclick="chooseSection('${s.id}')">
+      <span class="section-name">${esc(s.name)}</span>
+      <button class="delete-small" onclick="deleteSection(event,'${s.id}')">×</button>
+    </li>`).join("") : `<li class="muted">${t("addSection")}</li>`;
 
-    function t(key) {
-      return translations[language][key];
+  const main = document.getElementById("main"), s = section();
+  if (!s) { main.innerHTML = `<div class="empty">${t("addSection")}</div>`; return; }
+
+  s.mistakes ||= [];
+  s.cards ||= [];
+
+  if (quiz) {
+    if (quiz.at >= quiz.cards.length) {
+      main.innerHTML = `<div class="quiz-box"><h2>${t("result")}: ${quiz.score} ${t("of")} ${quiz.cards.length}</h2>
+        <button class="primary" onclick="startQuiz()">${t("retry")}</button>
+        <button class="secondary" onclick="endQuiz()">${t("finish")}</button></div>`;
+      return;
     }
-
-    function saveData() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-
-    function createId() {
-      return Date.now().toString() + Math.random().toString(16).slice(2);
-    }
-
-    function toggleLanguage() {
-      language = language === "ar" ? "en" : "ar";
-      localStorage.setItem("flash_language", language);
-
-      document.documentElement.lang = language;
-      document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
-
-      render();
-    }
-
-    function addSection() {
-      const input = document.getElementById("sectionInput");
-      const name = input.value.trim();
-
-      if (!name) return;
-
-      const newSection = {
-        id: createId(),
-        name,
-        cards: []
-      };
-
-      data.sections.push(newSection);
-      data.selectedSectionId = newSection.id;
-
-      input.value = "";
-      saveData();
-      render();
-    }
-
-    function selectSection(sectionId) {
-      data.selectedSectionId = sectionId;
-      currentCardIndex = 0;
-      saveData();
-      render();
-    }
-
-    function deleteSection(event, sectionId) {
-      event.stopPropagation();
-
-      if (!confirm(t("confirmDeleteSection"))) return;
-
-      data.sections = data.sections.filter(section => section.id !== sectionId);
-
-      if (data.selectedSectionId === sectionId) {
-        data.selectedSectionId = data.sections[0]?.id || null;
-      }
-
-      currentCardIndex = 0;
-      saveData();
-      render();
-    }
-
-    function getSelectedSection() {
-      return data.sections.find(
-        section => section.id === data.selectedSectionId
-      );
-    }
-
-    function openModal(cardId = null) {
-      editingCardId = cardId;
-
-      const modal = document.getElementById("cardModal");
-      const questionInput = document.getElementById("questionInput");
-      const answerInput = document.getElementById("answerInput");
-
-      questionInput.value = "";
-      answerInput.value = "";
-
-      if (cardId) {
-        const section = getSelectedSection();
-        const card = section.cards.find(card => card.id === cardId);
-
-        if (card) {
-          questionInput.value = card.question;
-          answerInput.value = card.answer;
-        }
-      }
-
-      document.getElementById("modalTitle").textContent =
-        cardId ? t("editCardTitle") : t("addCardTitle");
-
-      modal.classList.add("show");
-      questionInput.focus();
-    }
-
-    function closeModal() {
-      document.getElementById("cardModal").classList.remove("show");
-      editingCardId = null;
-    }
-
-    function saveCard() {
-      const question = document.getElementById("questionInput").value.trim();
-      const answer = document.getElementById("answerInput").value.trim();
-
-      if (!question || !answer) {
-        alert(t("emptyQuestion"));
-        return;
-      }
-
-      const section = getSelectedSection();
-      if (!section) return;
-
-      if (editingCardId) {
-        const card = section.cards.find(card => card.id === editingCardId);
-
-        if (card) {
-          card.question = question;
-          card.answer = answer;
-        }
-      } else {
-        section.cards.push({
-          id: createId(),
-          question,
-          answer,
-          known: false
-        });
-
-        currentCardIndex = section.cards.length - 1;
-      }
-
-      saveData();
-      closeModal();
-      render();
-    }
-
-    function deleteCard(cardId) {
-      if (!confirm(t("confirmDeleteCard"))) return;
-
-      const section = getSelectedSection();
-      section.cards = section.cards.filter(card => card.id !== cardId);
-
-      if (currentCardIndex >= section.cards.length) {
-        currentCardIndex = Math.max(section.cards.length - 1, 0);
-      }
-
-      saveData();
-      render();
-    }
-
-    function flipCard() {
-      const card = document.querySelector(".flashcard");
-      if (card) card.classList.toggle("flipped");
-    }
-
-    function changeCard(direction) {
-      const section = getSelectedSection();
-      if (!section || section.cards.length === 0) return;
-
-      currentCardIndex += direction;
-
-      if (currentCardIndex < 0) {
-        currentCardIndex = section.cards.length - 1;
-      }
-
-      if (currentCardIndex >= section.cards.length) {
-        currentCardIndex = 0;
-      }
-
-      render();
-    }
-
-    function markCard(known) {
-      const section = getSelectedSection();
-      if (!section || !section.cards[currentCardIndex]) return;
-
-      section.cards[currentCardIndex].known = known;
-      saveData();
-
-      if (known) {
-        changeCard(1);
-      } else {
-        render();
-      }
-    }
-
-    function renderSections() {
-      const sectionList = document.getElementById("sectionList");
-
-      if (data.sections.length === 0) {
-        sectionList.innerHTML = `
-          <li style="color:#6b7280; text-align:center;">
-            ${t("addFirstSection")}
-          </li>
-        `;
-        return;
-      }
-
-      sectionList.innerHTML = data.sections.map(section => `
-        <li
-          class="section-item ${section.id === data.selectedSectionId ? "active" : ""}"
-          onclick="selectSection('${section.id}')"
-        >
-          <span class="section-name">
-            ${escapeHTML(section.name)}
-          </span>
-
-          <button
-            class="delete-btn"
-            onclick="deleteSection(event, '${section.id}')"
-            title="Delete"
-          >
-            ×
-          </button>
-        </li>
-      `).join("");
-    }
-
-    function renderMainContent() {
-      const mainContent = document.getElementById("mainContent");
-      const section = getSelectedSection();
-
-      if (!section) {
-        mainContent.innerHTML = `
-          <div class="empty-state">
-            <h2>${t("addFirstSection")}</h2>
-          </div>
-        `;
-        return;
-      }
-
-      const cards = section.cards;
-
-      if (cards.length === 0) {
-        mainContent.innerHTML = `
-          <div class="top-content">
-            <h2>${escapeHTML(section.name)}</h2>
-            <button class="primary-btn" onclick="openModal()">
-              + ${t("addCard")}
-            </button>
-          </div>
-
-          <div class="empty-state">
-            <p>${t("noCards")}</p>
-          </div>
-        `;
-        return;
-      }
-
-      if (currentCardIndex >= cards.length) {
-        currentCardIndex = cards.length - 1;
-      }
-
-      const card = cards[currentCardIndex];
-      const knownCards = cards.filter(card => card.known).length;
-      const progress = Math.round((knownCards / cards.length) * 100);
-
-      mainContent.innerHTML = `
-        <div class="top-content">
-          <div>
-            <h2>${escapeHTML(section.name)}</h2>
-            <div class="stats">
-              <span>${t("card")} ${currentCardIndex + 1} / ${cards.length}</span>
-              <span>${t("progress")}: ${progress}%</span>
-            </div>
-          </div>
-
-          <button class="primary-btn" onclick="openModal()">
-            + ${t("addCard")}
-          </button>
-        </div>
-
-        <div class="progress-container">
-          <div class="progress-bar">
-            <div class="progress-fill" style="width:${progress}%"></div>
-          </div>
-        </div>
-
-        <div class="flashcard-area">
-          <div class="flashcard" onclick="flipCard()">
-            <div class="card-face front">
-              <span class="card-label">${t("question")}</span>
-              ${escapeHTML(card.question)}
-            </div>
-
-            <div class="card-face back">
-              <span class="card-label">${t("answer")}</span>
-              ${escapeHTML(card.answer)}
-            </div>
-          </div>
-        </div>
-
-        <p style="text-align:center;color:#6b7280;margin-bottom:15px;">
-          ${t("clickToFlip")}
-        </p>
-
-        <div class="card-actions">
-          <button class="secondary-btn" onclick="changeCard(-1)">
-            ${t("previous")}
-          </button>
-
-          <button class="success-btn" onclick="markCard(true)">
-            ${t("remembered")}
-          </button>
-
-          <button class="danger-btn" onclick="markCard(false)">
-            ${t("forgot")}
-          </button>
-
-          <button class="secondary-btn" onclick="changeCard(1)">
-            ${t("next")}
-          </button>
-
-          <button class="secondary-btn" onclick="openModal('${card.id}')">
-            ${language === "ar" ? "تعديل" : "Edit"}
-          </button>
-
-          <button class="danger-btn" onclick="deleteCard('${card.id}')">
-            ${t("deleteCard")}
-          </button>
-        </div>
-      `;
-    }
-
-    function renderTexts() {
-      document.getElementById("appTitle").textContent = t("title");
-      document.getElementById("sectionsTitle").textContent = t("sections");
-      document.getElementById("sectionInput").placeholder = t("sectionPlaceholder");
-      document.getElementById("languageBtn").textContent =
-        language === "ar" ? "English" : "العربية";
-
-      document.getElementById("questionLabel").textContent = t("question");
-      document.getElementById("answerLabel").textContent = t("answer");
-      document.getElementById("cancelBtn").textContent = t("cancel");
-      document.getElementById("saveBtn").textContent = t("save");
-    }
-
-    function render() {
-      document.documentElement.lang = language;
-      document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
-
-      renderTexts();
-      renderSections();
-      renderMainContent();
-    }
-
-    function escapeHTML(text) {
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    document.getElementById("sectionInput").addEventListener("keydown", event => {
-      if (event.key === "Enter") {
-        addSection();
-      }
-    });
-
-    document.getElementById("cardModal").addEventListener("click", event => {
-      if (event.target.id === "cardModal") {
-        closeModal();
-      }
-    });
-
-    render();
-  </script>
+    const c = quiz.cards[quiz.at];
+    const options = [...quiz.cards].sort(() => Math.random() - .5).slice(0, Math.min(4, quiz.cards.length));
+    if (!options.some(o => o.id === c.id)) options[Math.floor(Math.random()*options.length)] = c;
+    main.innerHTML = `<div class="toolbar"><h2>${t("quizTitle")} — ${esc(s.name)}</h2>
+      <span>${quiz.at+1} / ${quiz.cards.length}</span>
+      <button class="secondary" onclick="endQuiz()">${t("finish")}</button></div>
+      <div class="quiz-question">${c.question ? esc(c.question) : ""}
+        ${c.questionImage ? `<img src="${c.questionImage}">` : ""}</div>
+      <div class="quiz-options">${options.map(o => `<button class="quiz-option" onclick="quizAnswer('${o.id}')">
+        ${o.answer ? esc(o.answer) : ""}${o.answerImage ? `<img style="max-width:100px;max-height:70px;vertical-align:middle" src="${o.answerImage}">` : ""}
+      </button>`).join("")}</div>`;
+    return;
+  }
+
+  const mistakesButton = `<button class="secondary" onclick="showMistakes()">${t("errors")} (${s.mistakes.length})</button>`;
+  if (window.showMistakeList) {
+    main.innerHTML = `<div class="toolbar"><h2>${t("errors")} — ${esc(s.name)}</h2>${mistakesButton}</div>
+      ${s.mistakes.length ? s.mistakes.map(c => `<div style="border-bottom:1px solid #e5e7eb;padding:14px 0">
+        <div><b>${t("question")}:</b> ${esc(c.question || "")}${c.questionImage ? `<img class="preview" src="${c.questionImage}">` : ""}</div>
+        <div style="margin-top:8px"><b>${t("answer")}:</b> ${esc(c.answer || "")}${c.answerImage ? `<img class="preview" src="${c.answerImage}">` : ""}</div>
+        <div class="actions" style="margin-top:10px">
+          <button class="good" onclick="restoreMistake('${c.id}')">${t("addToCards")}</button>
+          <button class="bad" onclick="removeMistake('${c.id}')">${t("removeError")}</button>
+        </div></div>`).join("") : `<div class="empty">${t("noCards")}</div>`}`;
+    return;
+  }
+
+  if (!s.cards.length) {
+    main.innerHTML = `<div class="toolbar"><h2>${esc(s.name)}</h2><div class="actions">
+      ${mistakesButton}<button class="primary" onclick="openModal()">+ ${t("addCard")}</button></div></div>
+      <div class="empty">${t("noCards")}</div>`;
+    return;
+  }
+
+  index = Math.min(index, s.cards.length - 1);
+  const c = s.cards[index], known = s.cards.filter(x => x.known).length;
+  const pct = Math.round(known / s.cards.length * 100);
+  main.innerHTML = `<div class="toolbar"><div><h2>${esc(s.name)}</h2>
+      <span class="muted">${t("card")} ${index+1} / ${s.cards.length} · ${t("progress")} ${pct}%</span></div>
+      <div class="actions">${mistakesButton}<button class="primary" onclick="openModal()">+ ${t("addCard")}</button>
+      <button class="good" onclick="startQuiz()">${t("startQuiz")}</button></div></div>
+    <div class="progress"><div style="width:${pct}%"></div></div>
+    <div class="card-wrap"><div class="flashcard" onclick="flip()">
+      ${sideHTML(c.question,c.questionImage,t("question"),"front")}
+      ${sideHTML(c.answer,c.answerImage,t("answer"),"back")}
+    </div></div><p class="muted">${t("flip")}</p>
+    <div class="actions" style="justify-content:center">
+      <button class="secondary" onclick="move(-1)">${t("previous")}</button>
+      <button class="good" onclick="markKnown(true)">${t("knew")}</button>
+      <button class="bad" onclick="markKnown(false)">${t("forgot")}</button>
+      <button class="secondary" onclick="move(1)">${t("next")}</button>
+      <button class="secondary" onclick="openModal('${c.id}')">${t("edit")}</button>
+      <button class="bad" onclick="deleteCard('${c.id}')">${t("delete")}</button>
+    </div>`;
+}
+window.showMistakeList = false;
+function showMistakes() { window.showMistakeList = !window.showMistakeList; render(); }
+document.getElementById("sectionInput").addEventListener("keydown", e => { if(e.key==="Enter") addSection(); });
+document.getElementById("modal").addEventListener("click", e => { if(e.target.id==="modal") closeModal(); });
+render();
+</script>
 </body>
 </html>
